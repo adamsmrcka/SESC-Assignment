@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #e9ecef;
+            border-bottom: 1px solid #ddd;
+        }
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .nav-link {
+            font-size: 18px;
+            color: #333;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            padding: 30px;
+        }
+        .card-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px; /* Decreased margin to make space for two lines */
+            line-height: 1.2; /* Added to ensure space for two lines */
+        }
+        .course-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .course-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .course-abbreviation {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .course-fee {
+            font-size: 18px;
+            color: #555;
+        }
+        .btn-details {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-details:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Student Portal</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/main">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/all-courses">All Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/my-courses">My Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/student-profile">Student Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/graduation">Graduation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/sign-out">Sign Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">All Courses</h1>
+                    <div class="row">
+                        <th:block th:each="course : ${courses}">
+                            <div class="col-md-4 mb-4">
+                                <div class="card" style="height: 100%;"> <!-- Adjusted card height -->
+                                    <div class="card-body">
+                                        <h3 class="course-title" th:text="${course.title}"></h3>
+                                        <div class="course-info">
+                                            <p class="course-abbreviation" th:text="${course.abbreviation}"></p>
+                                            <span class="course-fee" th:text="'£' + ${course.fee}"></span>
+                                        </div>
+                                        <a th:href="@{/course-details/{id}(id=${course.id})}" class="btn btn-details mt-3">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
