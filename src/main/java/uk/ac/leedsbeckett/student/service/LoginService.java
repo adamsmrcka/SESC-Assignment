@@ -21,10 +21,6 @@ public class LoginService {
         this.integrationService = integrationService;
     }
 
-    public void setCurrentUser(Student stud) {
-        this.student = studentRepository.findStudentById(stud.getId());
-    }
-
     @Transactional
     public boolean existsByEmail(String email) {
         return loginRepository.existsByEmail(email);
@@ -71,7 +67,6 @@ public class LoginService {
         Account account = new Account();
         account.setStudentId(studentID);
         account.setHasOutstandingBalance(false);
-
 
         // Create and save the Login entity
         Login login1 = new Login();

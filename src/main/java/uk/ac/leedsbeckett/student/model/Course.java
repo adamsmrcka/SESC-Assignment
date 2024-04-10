@@ -32,6 +32,7 @@ public class Course {
     private Long id;
     private String title;
     private String abbreviation;
+    private String description;
     private double fee;
 
     @ManyToMany(mappedBy = "coursesEnrolledIn")
@@ -39,9 +40,10 @@ public class Course {
     @ToString.Exclude
     Set<Student> studentsEnrolledInCourse;
 
-    public Course(String title, String abbreviation, double fee) {
+    public Course(String title, String abbreviation, String description, double fee) {
         this.title = title;
         this.abbreviation = abbreviation;
+        this.description = description;
         this.fee = fee;
     }
 }

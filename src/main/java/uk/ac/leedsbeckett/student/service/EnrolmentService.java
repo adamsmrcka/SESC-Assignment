@@ -23,7 +23,10 @@ public class EnrolmentService {
         return studentService.getCurrentUser();
     }
 
-    public void enrolStudentInCourse(Student student, Optional<Course> course) {
+    public void enrolStudentInCourse(Student student, Course course) {
+        if (student.getCoursesEnrolledIn().contains(course)) {
+            throw new IllegalStateException("Student is already enrolled in this course");
+        }
         student.enrolInCourse(course);
         studentRepository.save(student);
 
@@ -44,7 +47,7 @@ public class EnrolmentService {
             String referenceNumber = createdInvoice.getReference();
             // Now you have the reference number
         } else {
-            // Handle error if necessary
+            throw new RuntimeException("Failed to create course fee invoice");
         }
     }
 }

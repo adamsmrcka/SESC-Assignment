@@ -27,15 +27,4 @@ public class StudentController {
         return studentService.getStudentByIdJson(id);
     }
 
-    /**
-     * GET mapping for the home page.
-     *
-     * @return ModelAndView of the home page, with the user's information on it.
-     */
-    @GetMapping(value = "/home")
-    public ModelAndView homePage() {
-        ModelAndView modelAndView = new ModelAndView("home");
-        modelAndView.addObject("student", studentService.getCurrentUser());
-        return modelAndView;
-    }
 }

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.Student;
 import uk.ac.leedsbeckett.student.service.CourseService;
@@ -25,15 +27,24 @@ public class EnrolmentController {
         this.courseService = courseService;
     }
 
-    @PostMapping("/course-details/{id}")
-    public String enrollStudent(@PathVariable Long courseId) {
+    @PostMapping("/enrol")
+    public String enrollStudent(@RequestParam("courseId") Long courseId, RedirectAttributes attributes) {
+        try {
+            Course course = courseService.getCourseById(courseId);
+            System.out.println(courseId);
+            Student student = studentService.getCurrentUser();
 
-        Optional<Course> course = courseService.getCourseById(courseId);
-        Student student = enrolmentService.getStudent();
-        // Enroll the student in the course
-        enrolmentService.enrolStudentInCourse(student, course);
+            enrolmentService.enrolStudentInCourse(student, course);
 
-        // Redirect to a success page or any other appropriate action
-        return "enrollment-success";
+            attributes.addFlashAttribute("enrollmentSuccessMessage", "Enrollment successful!");
+            return "redirect:/enrollment-success";
+        } catch (IllegalStateException e) {
+            attributes.addFlashAttribute("errorMessage", "Student is already enrolled in this course");
+        } catch (Exception e) {
+            attributes.addFlashAttribute("errorMessage", "Failed to enroll in the course. Please try again later.");
+        }
+
+        return "redirect:/course-details/" + courseId;
     }
 }
+

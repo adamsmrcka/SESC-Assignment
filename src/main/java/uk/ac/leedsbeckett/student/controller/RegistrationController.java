@@ -63,8 +63,6 @@ public class RegistrationController {
      */
     @PostMapping(value = "/login")
     public ModelAndView checkLogin(Login login, @RequestParam String password) {
-        System.out.println(login.getEmail());
-        System.out.println(password);
         if (loginService.authenticate(login.getEmail(), password)) {
             Login loggedInUser = loginService.getByEmail(login.getEmail());
             Student loggedInStudent = studentService.getStudentByExternalStudentId(loggedInUser.getStudentID());

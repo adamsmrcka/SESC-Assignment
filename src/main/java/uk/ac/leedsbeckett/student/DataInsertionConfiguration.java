@@ -142,19 +142,19 @@ public class DataInsertionConfiguration {
                 studentRepository.saveAll(students);
                 // Inserting all courses
                 List<Course> courses = Arrays.asList(
-                        new Course("Introduction to Programming", "CS101", 1000),
-                        new Course("Database Management", "DBMS202", 1200),
-                        new Course("Linear Algebra", "MATH301", 800),
-                        new Course("Data Structures and Algorithms", "DSA303", 2000),
-                        new Course("Web Development", "WEBD405", 180),
-                        new Course("Computer Networks", "CN404", 2500),
-                        new Course("Software Engineering", "SE507", 3500),
-                        new Course("Artificial Intelligence", "AI601", 2800),
-                        new Course("Operating Systems", "OS704", 4000),
-                        new Course("Machine Learning", "ML802", 5000),
-                        new Course("Digital Image Processing", "DIP905", 3200),
-                        new Course("Computer Graphics", "CG1006", 4500),
-                        new Course("Mobile Application Development", "MAD1107", 1500));
+                        new Course("Introduction to Programming", "CS101", "Learn basic programming concepts and logic.", 1000),
+                        new Course("Database Management", "DBMS202", "Study database design and SQL.", 1200),
+                        new Course("Linear Algebra", "MATH301", "Explore vectors, matrices, and linear transformations.", 800),
+                        new Course("Data Structures and Algorithms", "DSA303", "Learn essential data structures and algorithms.", 2000),
+                        new Course("Web Development", "WEBD405", "Build dynamic websites using HTML, CSS, and JavaScript.", 180),
+                        new Course("Computer Networks", "CN404", "Understand network protocols and architectures.", 2500),
+                        new Course("Software Engineering", "SE507", "Explore software development methodologies.", 3500),
+                        new Course("Artificial Intelligence", "AI601", "Study AI algorithms and applications.", 2800),
+                        new Course("Operating Systems", "OS704", "Learn about OS structure and functionality.", 4000),
+                        new Course("Machine Learning", "ML802", "Explore statistical models and machine learning algorithms.", 5000),
+                        new Course("Digital Image Processing", "DIP905", "Learn techniques for digital image analysis and manipulation.", 3200),
+                        new Course("Computer Graphics", "CG1006", "Explore rendering techniques and graphics programming.", 4500),
+                        new Course("Mobile Application Development", "MAD1107", "Build mobile apps for iOS and Android platforms.", 1500));
                 courseRepository.saveAll(courses);
 
                 students.get(0).enrolInCourse(courses.get(0));

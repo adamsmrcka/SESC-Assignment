@@ -72,9 +72,20 @@
         .btn-details:hover {
             background-color: #0056b3;
         }
+        .user-info {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+<!-- Display user info above navigation bar -->
+<div class="user-info">
+    Welcome, <span th:text="${currentUser.forename}"></span> <span th:text="${currentUser.surname}"></span>!
+</div>
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
         <a class="navbar-brand" href="#">Student Portal</a>
