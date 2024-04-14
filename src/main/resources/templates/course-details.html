@@ -123,8 +123,8 @@
                         <p><strong>Fee:</strong> £[[${course.fee}]]</p>
                     </div>
                     <div class="d-flex justify-content-between mt-3">
-                        <form action="/enrol" method="post" class="w-50 me-2"> <!-- Form to enroll student -->
-                            <input type="hidden" name="courseId" value="${course.id}">
+                        <form th:action="@{/enrol}" method="post" class="w-50 me-2">
+                            <input type="hidden" name="courseId" th:value="${course.id}">
                             <button type="submit" class="btn btn-enroll w-100">Enroll to this Course</button>
                         </form>
                         <a href="/all-courses" class="btn btn-back w-50">Back to All Courses</a>

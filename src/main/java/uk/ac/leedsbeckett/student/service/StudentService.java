@@ -1,8 +1,12 @@
 package uk.ac.leedsbeckett.student.service;
 
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.leedsbeckett.student.controller.StudentController;
+import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.Login;
 import uk.ac.leedsbeckett.student.model.Student;
 import uk.ac.leedsbeckett.student.model.StudentRepository;
@@ -16,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class StudentService {
     private Student student;
     private final StudentRepository studentRepository;
-
+    @Autowired
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
@@ -29,15 +33,19 @@ public class StudentService {
                         .getStudentJson(student.getId())).withSelfRel());
     }
 
+    @Transactional
     public Student getCurrentUser() {
         return this.student;
     }
 
+    @Transactional
     public void setCurrentUser(Student stud) {
         this.student = studentRepository.findStudentById(stud.getId());
     }
 
+    @Transactional
     public Student getStudentByExternalStudentId(String studentID) {
         return studentRepository.findStudentsByExternalStudentId(studentID);
     }
+
 }

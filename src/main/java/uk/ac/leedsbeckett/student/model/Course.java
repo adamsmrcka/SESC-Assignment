@@ -2,6 +2,7 @@ package uk.ac.leedsbeckett.student.model;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,5 +46,6 @@ public class Course {
         this.abbreviation = abbreviation;
         this.description = description;
         this.fee = fee;
+        this.studentsEnrolledInCourse = new HashSet<>();
     }
 }

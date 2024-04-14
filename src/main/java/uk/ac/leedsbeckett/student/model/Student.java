@@ -8,6 +8,7 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Data
@@ -28,7 +29,7 @@ public class Student {
     private String surname;
     private String forename;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "STUDENT_COURSE_TABLE",
             joinColumns = {
                     @JoinColumn(name = "student_id")
@@ -45,11 +46,17 @@ public class Student {
     }
 
 
+    @Transactional
     public void enrolInCourse(Course course) {
         if (coursesEnrolledIn == null) {
             coursesEnrolledIn = new HashSet<>();
         }
-        coursesEnrolledIn.add(course);
+
+        // Check if the course is already enrolled
+        if (!coursesEnrolledIn.contains(course)) {
+            coursesEnrolledIn.add(course);
+            course.getStudentsEnrolledInCourse().add(this);
+        }
     }
 
     public Student(String externalStudentId, String forename, String surname) {
