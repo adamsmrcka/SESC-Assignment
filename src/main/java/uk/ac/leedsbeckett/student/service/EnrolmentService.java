@@ -27,7 +27,7 @@ public class EnrolmentService {
     }
 
     @Transactional
-    public void enrolStudentInCourse(Student student, Course course) {
+    public Invoice enrolStudentInCourse(Student student, Course course) {
 
         Student student1 = studentRepository.findStudentById(student.getId());
         Course courseEnroll = courseRepository.findCourseById(course.getId());
@@ -43,8 +43,7 @@ public class EnrolmentService {
             ResponseEntity<Invoice> response = integrationService.createCourseFeeInvoice(invoice);
             if (response.getStatusCode().is2xxSuccessful()) {
                 Invoice createdInvoice = response.getBody();
-                String referenceNumber = createdInvoice.getReference();
-                System.out.println(referenceNumber);
+                return createdInvoice;
             } else {
                 throw new RuntimeException("Failed to create course fee invoice");
             }
@@ -73,5 +72,7 @@ public class EnrolmentService {
         invoice.setAmount(course.getFee());
         invoice.setDueDate(LocalDate.now().plusDays(30));
         return invoice;
+
+
     }
 }
