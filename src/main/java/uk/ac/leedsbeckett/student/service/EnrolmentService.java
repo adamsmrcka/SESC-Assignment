@@ -1,15 +1,17 @@
 package uk.ac.leedsbeckett.student.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
 import uk.ac.leedsbeckett.student.model.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Service
 public class EnrolmentService {
@@ -17,29 +19,36 @@ public class EnrolmentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final IntegrationService integrationService;
+    private final CourseService courseService;
 
 
     @Autowired
-    public EnrolmentService(StudentRepository studentRepository, IntegrationService integrationService, CourseRepository courseRepository) {
+    public EnrolmentService(StudentRepository studentRepository, IntegrationService integrationService, CourseRepository courseRepository, CourseService courseService) {
         this.studentRepository = studentRepository;
         this.integrationService = integrationService;
         this.courseRepository = courseRepository;
+        this.courseService = courseService;
+    }
+
+    public EntityModel<Invoice> enrollStudentInCourseJson(EnrolmentRequest enrolmentRequest){
+
+        Invoice invoice = enrolStudentInCourse(enrolmentRequest);
+        return EntityModel.of(invoice);
     }
 
     @Transactional
-    public Invoice enrolStudentInCourse(Student student, Course course) {
+    public Invoice enrolStudentInCourse(EnrolmentRequest enrolmentRequest) {
 
-        Student student1 = studentRepository.findStudentById(student.getId());
-        Course courseEnroll = courseRepository.findCourseById(course.getId());
-        if (isStudentEnrolledInCourseWithId(student1, courseEnroll.getId())) {
+        Student student = studentRepository.findStudentById(enrolmentRequest.getStudentId());
+        Course courseEnroll = courseRepository.findCourseById(enrolmentRequest.getCourseId());
+        if (isStudentEnrolledInCourseWithId(student, courseEnroll.getId())) {
             throw new RuntimeException("Error: Student is already enrolled in this course!");
         }
-        student1.enrolInCourse(courseEnroll);
-            System.out.println(courseEnroll.getId());
-            studentRepository.save(student1);
+        student.enrolInCourse(courseEnroll);
+            studentRepository.save(student);
 
             // Create invoice for course fee
-            Invoice invoice = createCourseFeeInvoice(student, course);
+            Invoice invoice = createCourseFeeInvoice(student, courseEnroll);
             ResponseEntity<Invoice> response = integrationService.createCourseFeeInvoice(invoice);
             if (response.getStatusCode().is2xxSuccessful()) {
                 Invoice createdInvoice = response.getBody();
@@ -49,12 +58,14 @@ public class EnrolmentService {
             }
     }
 
-    private boolean isStudentEnrolledInCourseWithId(Student student, Long courseId) {
+    @Transactional
+    public boolean isStudentEnrolledInCourseWithId(Student student, Long courseId) {
         // Check if the student is enrolled in any course with the specified course ID
-        Set<Course> enrolledCourses = student.getCoursesEnrolledIn();
-        if (enrolledCourses != null) {
-            for (Course enrolledCourse : enrolledCourses) {
-                if (enrolledCourse.getId().equals(courseId)) {
+        Course course = courseService.getCourseById(courseId);
+        Set<Student> enrolledStudents = course.getStudentsEnrolledInCourse();
+        if (enrolledStudents != null) {
+            for (Student enrolledStudent : enrolledStudents) {
+                if (enrolledStudent.getId().equals(student.getId())) {
                     return true;
                 }
             }
@@ -72,7 +83,5 @@ public class EnrolmentService {
         invoice.setAmount(course.getFee());
         invoice.setDueDate(LocalDate.now().plusDays(30));
         return invoice;
-
-
     }
 }

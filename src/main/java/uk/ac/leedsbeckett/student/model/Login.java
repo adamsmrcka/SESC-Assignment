@@ -14,6 +14,10 @@ import java.util.Random;
 @Data
 public class Login {
 
+    public enum UserType {
+        ADMIN,
+        USER
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +27,13 @@ public class Login {
     @Column(unique = true)
     private String studentID;
     private String password;
+    private UserType type;
 
-    public Login(String email, String studentId, String password) {
+    public Login(String email, String studentId, String password, UserType type) {
         this.email = email;
         this.studentID = studentId;
         setPassword(password);
+        this.type = type;
     }
 
     public Login() {
@@ -43,6 +49,14 @@ public class Login {
     public void setPassword(String password) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         this.password = passwordEncoder.encode(password);
+    }
+    public void setType(String type) {
+        try {
+            this.type = UserType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Handle invalid user types here (e.g., default to a specific type)
+            this.type = UserType.USER; // Default to USER if type is not recognized
+        }
     }
 
     // Add a method to check if the provided password matches the hashed password

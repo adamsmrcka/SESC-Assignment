@@ -1,9 +1,16 @@
 package uk.ac.leedsbeckett.student.service;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.model.*;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.Random;
 
@@ -51,9 +58,26 @@ public class LoginService {
         } while (loginRepository.existsByStudentID(studentID)); // Check if the ID already exists
         return studentID;
     }
+    @Transactional
+    public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(RegistrationRequest request){
+        String studentId = registerUser(request.getPassword(), request.getForename(), request.getSurname(), request.getEmail(), request.getType());
+        Student student = studentRepository.findStudentsByExternalStudentId(studentId);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(student.getId())
+                .toUri();
+
+        EntityModel<Student> entityModel = EntityModel.of(student);
+        entityModel.add(Link.of(uri.toString(), IanaLinkRelations.SELF));
+
+        return ResponseEntity
+                .created(uri)
+                .body(entityModel);
+    }
 
     @Transactional
-    public String registerUser(String password, String forename, String surname, String email) {
+    public String registerUser(String password, String forename, String surname, String email, String type) {
         // Generate a unique studentID
         String studentID = generateUniqueStudentID();
 
@@ -73,6 +97,7 @@ public class LoginService {
         login1.setEmail(email);
         login1.setStudentID(studentID);
         login1.setPassword(password);
+        login1.setType(type);
 
         try {
             // Save student, login, and create the finance account
@@ -89,4 +114,9 @@ public class LoginService {
     }
 
 
+    @Transactional
+    public boolean emailExists(String email) {
+        Login user = getByEmail(email);
+        return user != null;
+    }
 }

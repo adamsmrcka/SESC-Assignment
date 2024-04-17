@@ -90,21 +90,18 @@
 <div class="container">
     <div class="login-form">
         <h2>Student Portal Login</h2>
-        <form action="/login" method="post">
+        <form id="loginForm" th:action="@{/api/login}" th:object="${registrationRequest}" method="post">
             <div class="form-group">
                 <label class="form-label" for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control" required="required">
+                <input type="email" id="email" name="email" class="form-control" th:field="*{email}" required="required">
             </div>
             <div class="form-group">
                 <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required="required">
+                <input type="password" id="password" name="password" class="form-control" th:field="*{password}" required="required">
             </div>
             <button type="submit" class="btn btn-primary btn-login">Sign in</button>
             <a href="http://localhost:8090/register" class="btn btn-primary btn-register">Register</a>
         </form>
-    </div>
-    <div class="success-message" th:if="${message}">
-        <p th:text="${message}"></p>
     </div>
     <div class="error-message" th:if="${error}">
         <p th:text="${error}"></p>
