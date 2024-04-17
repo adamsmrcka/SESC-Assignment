@@ -19,6 +19,7 @@ import uk.ac.leedsbeckett.student.service.IntegrationService;
 import uk.ac.leedsbeckett.student.service.LoginService;
 import uk.ac.leedsbeckett.student.service.StudentService;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -78,7 +79,7 @@ public class PortalController {
     }
 
     @PostMapping("/register")
-    public ModelAndView processRegistration(Model model, RedirectAttributes attributes, @RequestParam String email, @RequestParam String forename, @RequestParam String surname, @RequestParam String password) {
+    public ModelAndView processRegistration(Model model, @RequestParam String email, @RequestParam String forename, @RequestParam String surname, @RequestParam String password) {
         ModelAndView modelAndView = new ModelAndView();
         if (loginService.emailExists(email)) {
             modelAndView.addObject("error", "Email already used. Please try again.");
@@ -124,6 +125,37 @@ public class PortalController {
     public ModelAndView logIn() {
         ModelAndView modelAndView = new ModelAndView("login");
         modelAndView.addObject("registrationRequest", new RegistrationRequest());
+        return modelAndView;
+    }
+
+    @PostMapping("/login")
+    public ModelAndView processLogin(Model model, @RequestParam String email, @RequestParam String password) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (!loginService.emailExists(email)) {
+            modelAndView.addObject("error", "Email does not Exist. Please try again.");
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
+        else {
+            try {
+                RegistrationRequest request = new RegistrationRequest();
+                request.setEmail(email);
+                request.setPassword(password);
+                ResponseEntity<EntityModel<Student>> responseEntity = registrationController.checkLoginJson(request);
+                Student student = responseEntity.getBody().getContent();
+                if (student != null && student.getId() != null) {
+                    modelAndView.setViewName("redirect:/main");
+                } else {
+                    model.addAttribute("error", "Login failed! Please try again.");
+                    RedirectView redirectView = new RedirectView("/login", true);
+                    modelAndView.setView(redirectView);
+                }
+            } catch (Exception e) {
+                modelAndView.addObject("error", "Login failed. Please try again.");
+                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.setView(redirectView);
+            }
+        }
         return modelAndView;
     }
 
@@ -179,33 +211,40 @@ public class PortalController {
     }
 
     @GetMapping("/enrollment-success")
-    public String showEnrollmentSuccess(Model model) {
+    public ModelAndView showEnrollmentSuccess(@RequestParam("reference") String reference, @RequestParam("dueDate") LocalDate date, @RequestParam("amount") Double amount) {
+        ModelAndView modelAndView = new ModelAndView();
         Student currentUser = studentService.getCurrentUser();
         if (currentUser != null) {
             // Retrieve invoice details from the model attributes
-            if (model.containsAttribute("invoice")) {
-                Invoice invoice = (Invoice) model.getAttribute("invoice");
-                model.addAttribute("invoice", invoice);
-                model.addAttribute("currentUser", currentUser);
-                return "/enrollment-success"; // Return the name of the success view template
-            } else {
-                // If no invoice details found, handle the error scenario gracefully
-                model.addAttribute("errorMessage", "No invoice details found");
-                return "/course-details/{id}"; // Redirect to an error view
+            if (reference != null && date != null && amount != null) {
+                Invoice invoice = new Invoice();
+                invoice.setReference(reference);
+                invoice.setDueDate(date);
+                invoice.setAmount(amount);
+                modelAndView.setViewName("enrollment-success");
+                modelAndView.addObject("invoice", invoice);
+                modelAndView.addObject("currentUser", currentUser);
             }
-
+            else {
+                // If no invoice details found, handle the error scenario gracefully
+                modelAndView.addObject("errorMessage", "No invoice details found");
+                RedirectView redirectView = new RedirectView("/enrollment-success", true);
+                modelAndView.setView(redirectView);
+            }
         }
         else {
-            // User not logged in, redirect to login page
-            return "redirect:/login";
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
         }
+        return modelAndView;
     }
 
     @PostMapping("/enrol")
-    public String enrollStudent(@RequestParam("courseId") Long courseId, RedirectAttributes attributes) {
-        try {
-            Student currentUser = studentService.getCurrentUser();
+    public ModelAndView enrollStudent(@RequestParam("courseId") Long courseId) {
+        ModelAndView modelAndView = new ModelAndView();
+        Student currentUser = studentService.getCurrentUser();
             if (currentUser != null) {
+                try {
                 Course course = courseRepository.findCourseById(courseId);
                 EnrolmentRequest request = new EnrolmentRequest();
                 request.setStudentId(currentUser.getId()); // Set the current user as the student
@@ -217,26 +256,31 @@ public class PortalController {
                 if (invoice == null) {
                     throw new RuntimeException("Enrollment failed. Please try again later.");
                 }
-                attributes.addFlashAttribute("invoice", invoice);
-                return "redirect:/enrollment-success";
+                    modelAndView.addObject("invoice", invoice);
+                    RedirectView redirectView = new RedirectView("/enrollment-success?reference=" + invoice.getReference()
+                            + "&dueDate=" + invoice.getDueDate() + "&amount=" + invoice.getAmount(), true);                    modelAndView.setView(redirectView);
+                } catch (RuntimeException e) {
+                    String errorMessage;
+                    if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                        errorMessage = e.getMessage();
+                    } else {
+                        errorMessage = "Failed to enroll in the course. Please try again later.";
+                    }
+                    modelAndView.addObject("errorMessage", errorMessage);
+                    RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
+                    modelAndView.setView(redirectView);
+                } catch (Exception e) {
+                    modelAndView.addObject("errorMessage", "Failed to enroll in the course. Please try again later.");
+                    RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
+                    modelAndView.setView(redirectView);
+                }
             }
             else {
-                // User not logged in, redirect to login page
-                return "redirect:/login";
+                // Redirect to login page if user is not logged in
+                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.setView(redirectView);
             }
-        } catch (RuntimeException e) {
-            String errorMessage;
-            if (e.getMessage() != null && !e.getMessage().isEmpty()) {
-                errorMessage = e.getMessage();
-            } else {
-                errorMessage = "Failed to enroll in the course. Please try again later.";
-            }
-            attributes.addFlashAttribute("errorMessage", errorMessage);
-            return "redirect:/course-details/" + courseId;
-        } catch (Exception e) {
-            attributes.addFlashAttribute("errorMessage", "Failed to enroll in the course. Please try again later.");
-            return "redirect:/course-details/" + courseId;
-        }
+        return modelAndView;
     }
     @GetMapping("/my-courses")
     public ModelAndView showMyCourses(Model model) {

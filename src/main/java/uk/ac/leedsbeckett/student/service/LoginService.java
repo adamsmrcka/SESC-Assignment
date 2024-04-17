@@ -21,25 +21,24 @@ public class LoginService {
     private final LoginRepository loginRepository;
     private final StudentRepository studentRepository;
     private final IntegrationService integrationService;
+    private final StudentService studentService;
 
-    public LoginService(LoginRepository loginRepository, StudentRepository studentRepository, IntegrationService integrationService) {
+    public LoginService(StudentService studentService, LoginRepository loginRepository, StudentRepository studentRepository, IntegrationService integrationService) {
         this.loginRepository = loginRepository;
         this.studentRepository = studentRepository;
         this.integrationService = integrationService;
+        this.studentService = studentService;
     }
 
     @Transactional
-    public boolean existsByEmail(String email) {
-        return loginRepository.existsByEmail(email);
-    }
-
-    @Transactional
-    public boolean authenticate(String email, String password) {
+    public String authenticate(String email, String password) {
         Login user = getByEmail(email);
         if (user != null) {
-            return user.checkPassword(password);
+            if(user.checkPassword(password)){
+                return user.getStudentID();
+            }
         }
-        return false;
+        return null;
     }
 
     @Transactional
@@ -62,6 +61,25 @@ public class LoginService {
     public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(RegistrationRequest request){
         String studentId = registerUser(request.getPassword(), request.getForename(), request.getSurname(), request.getEmail(), request.getType());
         Student student = studentRepository.findStudentsByExternalStudentId(studentId);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(student.getId())
+                .toUri();
+
+        EntityModel<Student> entityModel = EntityModel.of(student);
+        entityModel.add(Link.of(uri.toString(), IanaLinkRelations.SELF));
+
+        return ResponseEntity
+                .created(uri)
+                .body(entityModel);
+    }
+
+    @Transactional
+    public ResponseEntity<EntityModel<Student>> loginUserJson(RegistrationRequest request){
+        String studentId = authenticate(request.getEmail(), request.getPassword());
+        Student student = studentRepository.findStudentsByExternalStudentId(studentId);
+        studentService.setCurrentUser(student);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

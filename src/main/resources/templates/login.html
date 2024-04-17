@@ -90,7 +90,7 @@
 <div class="container">
     <div class="login-form">
         <h2>Student Portal Login</h2>
-        <form id="loginForm" th:action="@{/api/login}" th:object="${registrationRequest}" method="post">
+        <form id="loginForm" th:action="@{/login}" th:object="${registrationRequest}" method="post">
             <div class="form-group">
                 <label class="form-label" for="email">Email</label>
                 <input type="email" id="email" name="email" class="form-control" th:field="*{email}" required="required">

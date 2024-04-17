@@ -20,9 +20,6 @@ public class RegistrationController {
     @Autowired
     private LoginService loginService;
 
-    @Autowired
-    private StudentService studentService;
-
 
     @PostMapping("/register")
     public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(@RequestBody RegistrationRequest request) {
@@ -30,18 +27,8 @@ public class RegistrationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> checkLogin(@RequestParam String email, @RequestParam String password) {
-        if (loginService.authenticate(email, password)) {
-            Login loggedInUser = loginService.getByEmail(email);
-            Student loggedInStudent = studentService.getStudentByExternalStudentId(loggedInUser.getStudentID());
-            studentService.setCurrentUser(loggedInStudent);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location", "/main");
-            return new ResponseEntity<>(headers, HttpStatus.FOUND);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Login Failed! Incorrect email or password.");
-        }
+    public ResponseEntity<EntityModel<Student>> checkLoginJson(@RequestBody RegistrationRequest request) {
+        return loginService.loginUserJson(request);
     }
 
 }

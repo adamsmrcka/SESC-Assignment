@@ -31,10 +31,6 @@ public class CourseService {
         this.studentRepository = studentRepository;
     }
 
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
-    }
-
     public Course getCourseById(Long id) {
         Optional<Course> courseOptional = courseRepository.findById(id);
         return courseOptional.orElse(null);

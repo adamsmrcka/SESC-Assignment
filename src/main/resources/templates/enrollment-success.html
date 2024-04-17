@@ -115,8 +115,7 @@
     <p>Your External ID: <strong th:text="${currentUser.externalStudentId}"></strong></p>
     <p>Reference Number: <strong th:text="${invoice.reference}"></strong></p>
     <p>Amount: <strong th:text="${invoice.amount}"></strong></p>
-    <p>Due Date: <strong th:text="${invoice.dueDate}"></strong></p>
-    <p>Type: <strong th:text="${invoice.type}"></strong></p>
+    <p>Due Date: £<strong th:text="${invoice.dueDate}"></strong></p>
     <div class="btn-container">
         <a href="/all-courses" class="btn btn-primary">View All Courses</a>
         <a href="http://localhost:8081/portal" class="btn btn-secondary">Pay Invoice</a>
