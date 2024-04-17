@@ -105,7 +105,7 @@
                     <a class="nav-link" href="/my-courses">My Courses</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/student-profile">Student Profile</a>
+                    <a class="nav-link" href="/profile">Student Profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/graduation">Graduation</a>
@@ -128,12 +128,12 @@
                             <div class="col-md-4 mb-4">
                                 <div class="card" style="height: 100%;"> <!-- Adjusted card height -->
                                     <div class="card-body">
-                                        <h3 class="course-title" th:text="${course.title}"></h3>
+                                        <h3 class="course-title" th:text="${course.content.title}"></h3>
                                         <div class="course-info">
-                                            <p class="course-abbreviation" th:text="${course.abbreviation}"></p>
-                                            <span class="course-fee" th:text="'£' + ${course.fee}"></span>
+                                            <p class="course-abbreviation" th:text="${course.content.abbreviation}"></p>
+                                            <span class="course-fee" th:text="'£' + ${course.content.fee}"></span>
                                         </div>
-                                        <a th:href="@{/course-details/{id}(id=${course.id})}" class="btn btn-details mt-3">View Details</a>
+                                        <a th:href="@{/course-details/{id}(id=${course.content.id})}" class="btn btn-details mt-3">View Details</a>
                                     </div>
                                 </div>
                             </div>

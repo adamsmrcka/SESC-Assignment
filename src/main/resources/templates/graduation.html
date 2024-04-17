@@ -114,30 +114,14 @@
         <div class="col-md-8 offset-md-2">
             <div class="card">
                 <div class="card-body">
-                    <h1 class="course-title">Course Details</h1>
+                    <h1 class="course-title">Graduation Eligibility</h1>
                     <div class="course-details">
-                        <!-- Display course details fetched from the server -->
-                        <p><strong>Title:</strong> [[${course.title}]]</p>
-                        <p><strong>Abbreviation:</strong> [[${course.abbreviation}]]</p>
-                        <p><strong>Description:</strong> [[${course.description}]]</p>
-                        <p><strong>Fee:</strong> £[[${course.fee}]]</p>
-                    </div>
-                    <div class="d-flex justify-content-between mt-3">
-                        <form th:action="@{/enrol}" method="post" class="w-50 me-2" th:unless="${isStudentEnrolled}">
-                            <input type="hidden" name="courseId" th:value="${course.id}">
-                            <button type="submit" class="btn btn-enroll w-100">Enroll to this Course</button>
-                        </form>
-                        <div th:if="${isStudentEnrolled}" class="w-50 me-2">
-                            <button type="button" class="btn btn-enroll w-100" disabled>Already Enrolled</button>
-                        </div>
-                        <a href="/all-courses" class="btn btn-back w-50">Back to All Courses</a>
-                    </div>
-                    <!-- Display error or success messages -->
-                    <div th:if="${errorMessage}" class="alert alert-danger mt-3" role="alert">
-                        <p th:text="${errorMessage}">Error Message</p>
-                    </div>
-                    <div th:if="${enrollmentSuccessMessage}" class="alert alert-success mt-3" role="alert">
-                        <p th:text="${enrollmentSuccessMessage}">Success Message</p>
+                        <p th:if="${eligible}">
+                            Congratulations! You are eligible to graduate.
+                        </p>
+                        <p th:unless="${eligible}">
+                            Sorry, you are not currently eligible to graduate due to an outstanding balance.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -15,10 +15,12 @@ import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.model.*;
 import uk.ac.leedsbeckett.student.service.EnrolmentService;
+import uk.ac.leedsbeckett.student.service.IntegrationService;
 import uk.ac.leedsbeckett.student.service.LoginService;
 import uk.ac.leedsbeckett.student.service.StudentService;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @RestController
 public class PortalController {
@@ -29,10 +31,14 @@ public class PortalController {
     private final CourseController courseController;
     private final EnrolmentController enrolmentController;
     private final RegistrationController registrationController;
+    private final StudentController studentController;
     private final LoginService loginService;
+    private final IntegrationService integrationService;
 
     @Autowired
-    public PortalController(LoginService loginService, CourseRepository courseRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
+    public PortalController(IntegrationService integrationService, StudentController studentController, LoginService loginService, CourseRepository courseRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
+        this.integrationService = integrationService;
+        this.studentController = studentController;
         this.loginService = loginService;
         this.courseRepository = courseRepository;
         this.studentService = studentService;
@@ -90,9 +96,8 @@ public class PortalController {
                 ResponseEntity<EntityModel<Student>> responseEntity = registrationController.CreateNewStudentJson(request);
                 Student student = responseEntity.getBody().getContent();
                 if (student != null && student.getId() != null) {
-                    modelAndView.addObject("studentId", student.getId());
-                    RedirectView redirectView = new RedirectView("/registration_success", true);
-                    modelAndView.setView(redirectView);
+                    modelAndView.setViewName("redirect:/registrationSuccess");
+                    modelAndView.addObject("studentID", student.getExternalStudentId());
                 } else {
                     model.addAttribute("error", "Registration failed! Please try again.");
                     RedirectView redirectView = new RedirectView("/register", true);
@@ -110,7 +115,7 @@ public class PortalController {
 
     @GetMapping("/registrationSuccess")
     public ModelAndView registrationSuccess(@RequestParam String studentID) {
-        ModelAndView modelAndView = new ModelAndView("registrationSuccess");
+        ModelAndView modelAndView = new ModelAndView("registrationsuccess");
         modelAndView.addObject("studentID", studentID);
         return modelAndView;
     }
@@ -140,7 +145,6 @@ public class PortalController {
             RedirectView redirectView = new RedirectView("/login", true);
             modelAndView.setView(redirectView);
         }
-
         return modelAndView;
     }
 
@@ -233,5 +237,108 @@ public class PortalController {
             attributes.addFlashAttribute("errorMessage", "Failed to enroll in the course. Please try again later.");
             return "redirect:/course-details/" + courseId;
         }
+    }
+    @GetMapping("/my-courses")
+    public ModelAndView showMyCourses(Model model) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Get current logged-in user
+        Student currentUser = studentService.getCurrentUser();
+
+        if (currentUser != null) {
+            CollectionModel<EntityModel<Course>> coursesModel = courseController.getEnrolledCoursesByStudentId(currentUser.getId());
+            Collection<EntityModel<Course>> courses = coursesModel.getContent();
+            modelAndView.setViewName("my-courses");
+            modelAndView.addObject("courses", courses);
+            modelAndView.addObject("currentUser", currentUser);
+        } else {
+            // Redirect to login page if user is not logged in
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+
+    @GetMapping("/profile")
+    public ModelAndView showMyProfile(@RequestParam(name = "error", required = false) String error, @RequestParam(name = "success", required = false) String success) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Get current logged-in user
+        Student currentUser = studentService.getCurrentUser();
+
+        if (currentUser != null) {
+            modelAndView.setViewName("profile");
+            modelAndView.addObject("currentUser", currentUser);
+            modelAndView.addObject("student", currentUser);
+            if (error != null) {
+                modelAndView.addObject("error", error);
+            }
+            if (success != null) {
+                modelAndView.addObject("success", success);
+            }
+
+        } else {
+            // Redirect to login page if user is not logged in
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+
+    @PostMapping("/profile")
+    public ModelAndView updateStudent(Model model, Student updateStudent) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            Student currentUser = studentService.getCurrentUser();
+            if (currentUser != null) {
+                updateStudent.setId(currentUser.getId());
+                updateStudent.setExternalStudentId(currentUser.getExternalStudentId());
+                ResponseEntity<EntityModel<Student>> responseEntity = studentController.updateStudentJson(updateStudent);
+                Student student = responseEntity.getBody().getContent();
+
+                if (student == null) {
+                    throw new RuntimeException("Enrollment failed. Please try again later.");
+                }
+                studentService.setCurrentUser(student);
+                model.addAttribute("success", "Profile updated!");
+                RedirectView redirectView = new RedirectView("/profile", true);
+                modelAndView.setView(redirectView);
+            }
+            else {
+                // User not logged in, redirect to login page
+                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.setView(redirectView);
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "Profile update failed! Please try again.");
+            RedirectView redirectView = new RedirectView("/profile", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+
+    @GetMapping("/graduation")
+    public ModelAndView showGraduation() {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Get current logged-in user
+        Student currentUser = studentService.getCurrentUser();
+        ResponseEntity<String> response = studentController.getGraduateEligibility(currentUser.getExternalStudentId());
+        String eligibility = response.getBody();
+        if (currentUser != null) {
+            if (Objects.equals(eligibility.toLowerCase(), "eligible")) {
+                    modelAndView.setViewName("graduation");
+                    modelAndView.addObject("currentUser", currentUser);
+                modelAndView.addObject("eligible", true);
+            }
+                else if(Objects.equals(eligibility.toLowerCase(), "non-eligible")) {
+                modelAndView.addObject("eligible", false);
+            }
+        } else {
+            // Redirect to login page if user is not logged in
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
     }
 }

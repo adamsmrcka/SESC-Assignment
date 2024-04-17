@@ -71,4 +71,14 @@ public class CourseService {
                 .getAllCoursesJson())
                 .withSelfRel());
     }
+
+    public ResponseEntity<EntityModel<Course>> createNewCourseJson(Course newCourse){
+        Course savedCourse = courseRepository.save(newCourse);
+        EntityModel<Course> entityModel = EntityModel.of(savedCourse,
+                linkTo(methodOn(CourseController.class).getCourseJson(savedCourse.getId())).withSelfRel(),
+                linkTo(methodOn(CourseController.class).getAllCoursesJson()).withRel("courses"));
+    return ResponseEntity
+            .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+            .body(entityModel);
+    }
 }

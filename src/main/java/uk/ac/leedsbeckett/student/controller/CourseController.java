@@ -24,13 +24,11 @@ import java.util.List;
 @RequestMapping("/api")
 public class CourseController {
     private final CourseService courseService;
-    private final StudentService studentService;
 
 
     @Autowired
-    public CourseController(CourseService courseService, StudentService studentService) {
+    public CourseController(CourseService courseService) {
         this.courseService = courseService;
-        this.studentService = studentService;
     }
 
     @GetMapping("/courses")
@@ -46,6 +44,11 @@ public class CourseController {
     @GetMapping("/courses/student/{id}")
     public CollectionModel<EntityModel<Course>> getEnrolledCoursesByStudentId(@PathVariable Long id) {
         return courseService.getEnrolledCoursesByStudentIdJson(id);
+    }
+
+    @PostMapping("/courses")
+    ResponseEntity<EntityModel<Course>> createCourseJson(@RequestBody Course newCourse){
+        return courseService.createNewCourseJson(newCourse);
     }
 
 }

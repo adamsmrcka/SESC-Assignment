@@ -3,8 +3,11 @@ package uk.ac.leedsbeckett.student.service;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.leedsbeckett.student.controller.CourseController;
 import uk.ac.leedsbeckett.student.controller.StudentController;
 import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.Login;
@@ -48,4 +51,13 @@ public class StudentService {
         return studentRepository.findStudentsByExternalStudentId(studentID);
     }
 
+    public ResponseEntity<EntityModel<Student>> updateStudentJson(Student updateStudent){
+        updateStudent.setCoursesEnrolledIn(getCurrentUser().getCoursesEnrolledIn());
+        Student updatedStudent = studentRepository.save(updateStudent);
+        EntityModel<Student> entityModel = EntityModel.of(updatedStudent,
+                linkTo(methodOn(StudentController.class).getStudentJson(updatedStudent.getId())).withSelfRel());
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
+    }
 }
