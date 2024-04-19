@@ -47,16 +47,16 @@ public class CourseService {
                 .withSelfRel());
     }
 
-    public EntityModel<Course> getCourseByIdJson (Long id){
+    public EntityModel<Course> getCourseByIdJson(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course with id " + id + " not found."));
         return EntityModel.of(course,
-            linkTo(methodOn(CourseController.class).getCourseJson(course.getId())).withSelfRel(),
-            linkTo(methodOn(CourseController.class).getAllCoursesJson()).withRel("courses"));
+                linkTo(methodOn(CourseController.class).getCourseJson(course.getId())).withSelfRel(),
+                linkTo(methodOn(CourseController.class).getAllCoursesJson()).withRel("courses"));
     }
 
 
-    public CollectionModel<EntityModel<Course>> getEnrolledCoursesByStudentIdJson(Long studentId){
+    public CollectionModel<EntityModel<Course>> getEnrolledCoursesByStudentIdJson(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
 
@@ -69,14 +69,14 @@ public class CourseService {
                 .withSelfRel());
     }
 
-    public ResponseEntity<EntityModel<Course>> createNewCourseJson(Course newCourse){
+    public ResponseEntity<EntityModel<Course>> createNewCourseJson(Course newCourse) {
         Course savedCourse = courseRepository.save(newCourse);
         EntityModel<Course> entityModel = EntityModel.of(savedCourse,
                 linkTo(methodOn(CourseController.class).getCourseJson(savedCourse.getId())).withSelfRel(),
                 linkTo(methodOn(CourseController.class).getAllCoursesJson()).withRel("courses"));
-    return ResponseEntity
-            .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-            .body(entityModel);
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
     }
 
     public ResponseEntity<String> deleteCourseByIdJson(Long courseId) {

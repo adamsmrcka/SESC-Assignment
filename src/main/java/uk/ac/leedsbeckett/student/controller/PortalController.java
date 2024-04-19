@@ -3,19 +3,15 @@ package uk.ac.leedsbeckett.student.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.model.*;
 import uk.ac.leedsbeckett.student.service.EnrolmentService;
-import uk.ac.leedsbeckett.student.service.IntegrationService;
 import uk.ac.leedsbeckett.student.service.LoginService;
 import uk.ac.leedsbeckett.student.service.StudentService;
 
@@ -35,6 +31,7 @@ public class PortalController {
     private final RegistrationController registrationController;
     private final StudentController studentController;
     private final LoginService loginService;
+
     @Autowired
     public PortalController(StudentController studentController, LoginService loginService, CourseRepository courseRepository, LoginRepository loginRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
         this.studentController = studentController;
@@ -91,8 +88,7 @@ public class PortalController {
             modelAndView.addObject("error", "Email already used. Please try again.");
             RedirectView redirectView = new RedirectView("/register", true);
             modelAndView.setView(redirectView);
-        }
-        else {
+        } else {
             try {
                 RegistrationRequest request = new RegistrationRequest();
                 request.setForename(forename);
@@ -141,8 +137,7 @@ public class PortalController {
             modelAndView.addObject("error", "Email does not Exist. Please try again.");
             RedirectView redirectView = new RedirectView("/login", true);
             modelAndView.setView(redirectView);
-        }
-        else {
+        } else {
             try {
                 RegistrationRequest request = new RegistrationRequest();
                 request.setEmail(email);
@@ -217,8 +212,7 @@ public class PortalController {
                     modelAndView.addObject("course", course);
                     modelAndView.addObject("currentUser", currentUser);
                     modelAndView.addObject("isStudentEnrolled", isStudentEnrolled);
-                }
-                else {
+                } else {
                     modelAndView.setViewName("course-details");
                     modelAndView.addObject("course", course);
                     modelAndView.addObject("currentUser", currentUser);
@@ -247,8 +241,7 @@ public class PortalController {
             if (login != null && login.getType() == Login.UserType.ADMIN) {
                 RedirectView redirectView = new RedirectView("/main", true);
                 modelAndView.setView(redirectView);
-            }
-            else {
+            } else {
                 modelAndView.addObject("isAdmin", isAdmin);
                 // Retrieve invoice details from the model attributes
                 if (reference != null && date != null && amount != null) {
@@ -266,8 +259,7 @@ public class PortalController {
                     modelAndView.setView(redirectView);
                 }
             }
-        }
-        else {
+        } else {
             RedirectView redirectView = new RedirectView("/login", true);
             modelAndView.setView(redirectView);
         }
@@ -278,8 +270,8 @@ public class PortalController {
     public ModelAndView enrollStudent(@RequestParam("courseId") Long courseId) {
         ModelAndView modelAndView = new ModelAndView();
         Student currentUser = studentService.getCurrentUser();
-            if (currentUser != null) {
-                try {
+        if (currentUser != null) {
+            try {
                 Course course = courseRepository.findCourseById(courseId);
                 EnrolmentRequest request = new EnrolmentRequest();
                 request.setStudentId(currentUser.getId()); // Set the current user as the student
@@ -291,32 +283,33 @@ public class PortalController {
                 if (invoice == null) {
                     throw new RuntimeException("Enrollment failed. Please try again later.");
                 }
-                    modelAndView.addObject("invoice", invoice);
-                    RedirectView redirectView = new RedirectView("/enrollment-success?reference=" + invoice.getReference()
-                            + "&dueDate=" + invoice.getDueDate() + "&amount=" + invoice.getAmount(), true);                    modelAndView.setView(redirectView);
-                } catch (RuntimeException e) {
-                    String errorMessage;
-                    if (e.getMessage() != null && !e.getMessage().isEmpty()) {
-                        errorMessage = e.getMessage();
-                    } else {
-                        errorMessage = "Failed to enroll in the course. Please try again later.";
-                    }
-                    modelAndView.addObject("errorMessage", errorMessage);
-                    RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
-                    modelAndView.setView(redirectView);
-                } catch (Exception e) {
-                    modelAndView.addObject("errorMessage", "Failed to enroll in the course. Please try again later.");
-                    RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
-                    modelAndView.setView(redirectView);
+                modelAndView.addObject("invoice", invoice);
+                RedirectView redirectView = new RedirectView("/enrollment-success?reference=" + invoice.getReference()
+                        + "&dueDate=" + invoice.getDueDate() + "&amount=" + invoice.getAmount(), true);
+                modelAndView.setView(redirectView);
+            } catch (RuntimeException e) {
+                String errorMessage;
+                if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                    errorMessage = e.getMessage();
+                } else {
+                    errorMessage = "Failed to enroll in the course. Please try again later.";
                 }
-            }
-            else {
-                // Redirect to login page if user is not logged in
-                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.addObject("errorMessage", errorMessage);
+                RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
+                modelAndView.setView(redirectView);
+            } catch (Exception e) {
+                modelAndView.addObject("errorMessage", "Failed to enroll in the course. Please try again later.");
+                RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
                 modelAndView.setView(redirectView);
             }
+        } else {
+            // Redirect to login page if user is not logged in
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
         return modelAndView;
     }
+
     @GetMapping("/my-courses")
     public ModelAndView showMyCourses(Model model) {
         ModelAndView modelAndView = new ModelAndView();
@@ -330,8 +323,7 @@ public class PortalController {
             if (login != null && login.getType() == Login.UserType.ADMIN) {
                 RedirectView redirectView = new RedirectView("/main", true);
                 modelAndView.setView(redirectView);
-            }
-            else {
+            } else {
                 modelAndView.addObject("isAdmin", isAdmin);
                 CollectionModel<EntityModel<Course>> coursesModel = courseController.getEnrolledCoursesByStudentId(currentUser.getId());
                 Collection<EntityModel<Course>> courses = coursesModel.getContent();
@@ -396,15 +388,13 @@ public class PortalController {
                 if (student == null) {
                     RedirectView redirectView = new RedirectView("/profile", true);
                     modelAndView.setView(redirectView);
-                }
-                else {
+                } else {
                     studentService.setCurrentUser(student);
                     modelAndView.addObject("success", "Profile updated!");
                     RedirectView redirectView = new RedirectView("/profile", true);
                     modelAndView.setView(redirectView);
                 }
-            }
-            else {
+            } else {
                 // User not logged in, redirect to login page
                 RedirectView redirectView = new RedirectView("/login", true);
                 modelAndView.setView(redirectView);
@@ -431,8 +421,7 @@ public class PortalController {
             if (login != null && login.getType() == Login.UserType.ADMIN) {
                 RedirectView redirectView = new RedirectView("/main", true);
                 modelAndView.setView(redirectView);
-            }
-            else {
+            } else {
                 modelAndView.addObject("isAdmin", isAdmin);
                 modelAndView.addObject("currentUser", currentUser);
                 if (Objects.equals(eligibility.toLowerCase(), "eligible")) {
@@ -449,6 +438,7 @@ public class PortalController {
         }
         return modelAndView;
     }
+
     @GetMapping("/create-course")
     public ModelAndView showCreateCourse(@RequestParam(name = "error", required = false) String error, @RequestParam(name = "success", required = false) String success) {
         ModelAndView modelAndView = new ModelAndView();
@@ -482,6 +472,7 @@ public class PortalController {
         }
         return modelAndView;
     }
+
     @PostMapping("/delete-course")
     public ModelAndView deleteCourse(@RequestParam("courseId") Long courseId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -501,14 +492,12 @@ public class PortalController {
                     modelAndView.addObject("error", "Deleting a course failed! Please try again.");
                     RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
                     modelAndView.setView(redirectView);
-                }
-                else {
+                } else {
                     modelAndView.addObject("success", "Course created!");
                     RedirectView redirectView = new RedirectView("/all-courses", true);
                     modelAndView.setView(redirectView);
                 }
-            }
-            else {
+            } else {
                 // User not logged in, redirect to login page
                 RedirectView redirectView = new RedirectView("/login", true);
                 modelAndView.setView(redirectView);
@@ -540,14 +529,12 @@ public class PortalController {
                     modelAndView.addObject("error", "Creating a new course failed! Please try again.");
                     RedirectView redirectView = new RedirectView("/create-course", true);
                     modelAndView.setView(redirectView);
-                }
-                else {
+                } else {
                     modelAndView.addObject("success", "Course created!");
                     RedirectView redirectView = new RedirectView("/create-course", true);
                     modelAndView.setView(redirectView);
                 }
-            }
-            else {
+            } else {
                 // User not logged in, redirect to login page
                 RedirectView redirectView = new RedirectView("/login", true);
                 modelAndView.setView(redirectView);
@@ -559,6 +546,7 @@ public class PortalController {
         }
         return modelAndView;
     }
+
     @GetMapping("/sign-out")
     public ModelAndView signOut() {
         ModelAndView modelAndView = new ModelAndView();

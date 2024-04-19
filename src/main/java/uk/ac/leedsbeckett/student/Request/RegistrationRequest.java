@@ -2,8 +2,6 @@ package uk.ac.leedsbeckett.student.Request;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.leedsbeckett.student.model.Login;
-
 @Getter
 @Setter
 public class RegistrationRequest {

@@ -1,16 +1,13 @@
 package uk.ac.leedsbeckett.student;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.leedsbeckett.student.model.*;
-import uk.ac.leedsbeckett.student.service.EnrolmentService;
 import uk.ac.leedsbeckett.student.service.LoginService;
 
 

@@ -33,18 +33,17 @@ public class StudentController {
     }
 
     @PostMapping("/student/update")
-    public ResponseEntity<EntityModel<Student>> updateStudentJson(@RequestBody Student updateStudent){
+    public ResponseEntity<EntityModel<Student>> updateStudentJson(@RequestBody Student updateStudent) {
         return studentService.updateStudentJson(updateStudent);
     }
 
     @GetMapping("/student/graduate/{studentId}")
     public ResponseEntity<String> getGraduateEligibility(@PathVariable String studentId) {
-         Account account = integrationService.getStudentAccount(studentId);
+        Account account = integrationService.getStudentAccount(studentId);
         if (account != null) {
-            if(account.isHasOutstandingBalance()) {
+            if (account.isHasOutstandingBalance()) {
                 return ResponseEntity.ok("Not-Eligible");
-            }
-            else {
+            } else {
                 return ResponseEntity.ok("Eligible");
             }
         } else {

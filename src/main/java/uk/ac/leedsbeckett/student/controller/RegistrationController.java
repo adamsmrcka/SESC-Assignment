@@ -1,14 +1,9 @@
 package uk.ac.leedsbeckett.student.controller;
 
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
-import uk.ac.leedsbeckett.student.model.Login;
 import uk.ac.leedsbeckett.student.model.Student;
 import uk.ac.leedsbeckett.student.service.LoginService;
 import uk.ac.leedsbeckett.student.service.StudentService;
@@ -17,10 +12,14 @@ import uk.ac.leedsbeckett.student.service.StudentService;
 @RequestMapping("/api")
 public class RegistrationController {
 
-    @Autowired
-    private LoginService loginService;
-    @Autowired
-    private StudentService studentService;
+    private final LoginService loginService;
+
+    private final StudentService studentService;
+
+    public RegistrationController(LoginService loginService, StudentService studentService) {
+        this.loginService = loginService;
+        this.studentService = studentService;
+    }
 
 
     @PostMapping("/register")

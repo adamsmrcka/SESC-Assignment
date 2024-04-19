@@ -1,9 +1,7 @@
 package uk.ac.leedsbeckett.student.model;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -12,13 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Data
-/*
-@Table(name = "STUDENT_TBL")
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
- */
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

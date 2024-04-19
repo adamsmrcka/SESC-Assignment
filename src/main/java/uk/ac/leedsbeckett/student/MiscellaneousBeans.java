@@ -1,12 +1,9 @@
 package uk.ac.leedsbeckett.student;
 
 import java.util.List;
-import java.util.Set;
-
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.client.RestTemplate;
 import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.CourseRepository;
@@ -17,9 +14,9 @@ import uk.ac.leedsbeckett.student.model.StudentRepository;
 @RequestMapping("/student/course")
 public class MiscellaneousBeans {
 
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
-    private CourseRepository courseRepository;
+    private final CourseRepository courseRepository;
 
     public MiscellaneousBeans(StudentRepository studentRepository,
                               CourseRepository courseRepository) {

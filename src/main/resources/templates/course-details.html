@@ -13,33 +13,41 @@
             text-align: center;
             font-weight: bold;
         }
+
         body {
             background-color: #f8f9fa;
         }
+
         .navbar {
             background-color: #e9ecef;
             border-bottom: 1px solid #ddd;
         }
+
         .navbar-brand {
             font-size: 24px;
             font-weight: bold;
             color: #333;
         }
+
         .nav-link {
             font-size: 18px;
             color: #333;
         }
+
         .container {
             margin-top: 20px;
         }
+
         .card {
             border: none;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .card-body {
             padding: 30px;
         }
+
         .course-title {
             font-size: 32px;
             font-weight: bold;
@@ -47,14 +55,17 @@
             margin-bottom: 20px;
             line-height: 1.2;
         }
+
         .course-details {
             margin-top: 20px;
         }
+
         .course-details p {
             font-size: 18px;
             color: #555;
             margin-bottom: 5px;
         }
+
         .btn-back, .btn-enroll {
             background-color: #007bff;
             color: #fff;
@@ -65,6 +76,7 @@
             transition: background-color 0.3s;
             margin-top: 10px;
         }
+
         @media (max-width: 768px) {
             .btn-enroll, .btn-back {
                 display: block;
@@ -86,28 +98,28 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/main">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/all-courses">All Courses</a>
-                    </li>
-                    <li class="nav-item" th:unless="${isAdmin}">
-                        <a class="nav-link" href="/my-courses">My Courses</a>
-                    </li>
-                    <li class="nav-item" th:if="${isAdmin}">
-                        <a href="/create-course" class="nav-link">Create Course</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile">Student Profile</a>
-                    </li>
-                    <li class="nav-item" th:unless="${isAdmin}">
-                        <a class="nav-link" href="/graduation">Graduation</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/sign-out">Sign Out</a>
-                    </li>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/main">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/all-courses">All Courses</a>
+                </li>
+                <li class="nav-item" th:unless="${isAdmin}">
+                    <a class="nav-link" href="/my-courses">My Courses</a>
+                </li>
+                <li class="nav-item" th:if="${isAdmin}">
+                    <a href="/create-course" class="nav-link">Create Course</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Student Profile</a>
+                </li>
+                <li class="nav-item" th:unless="${isAdmin}">
+                    <a class="nav-link" href="/graduation">Graduation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/sign-out">Sign Out</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -126,11 +138,13 @@
                         <p><strong>Fee:</strong> £[[${course.fee}]]</p>
                     </div>
                     <div class="d-flex justify-content-between mt-3">
-                        <form th:action="@{/enrol}" method="post" class="w-50 me-2" th:unless="${isStudentEnrolled} or ${isAdmin}">
+                        <form th:action="@{/enrol}" method="post" class="w-50 me-2"
+                              th:unless="${isStudentEnrolled} or ${isAdmin}">
                             <input type="hidden" name="courseId" th:value="${course.id}">
                             <button type="submit" class="btn btn-enroll w-100">Enroll to this Course</button>
                         </form>
-                        <form th:action="@{/delete-course}" th:object="${deleteCourse}" method="post" class="w-50 me-2" th:if="${isAdmin}">
+                        <form th:action="@{/delete-course}" th:object="${deleteCourse}" method="post" class="w-50 me-2"
+                              th:if="${isAdmin}">
                             <input type="hidden" name="courseId" th:value="${course.id}">
                             <button type="submit" class="btn btn-enroll w-100">Delete Course</button>
                         </form>

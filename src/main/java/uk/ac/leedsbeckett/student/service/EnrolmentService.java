@@ -11,8 +11,6 @@ import uk.ac.leedsbeckett.student.model.*;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
 @Service
 public class EnrolmentService {
 
@@ -51,8 +49,7 @@ public class EnrolmentService {
             Invoice invoice = createCourseFeeInvoice(student, courseEnroll);
             ResponseEntity<Invoice> response = integrationService.createCourseFeeInvoice(invoice);
             if (response.getStatusCode().is2xxSuccessful()) {
-                Invoice createdInvoice = response.getBody();
-                return createdInvoice;
+                return response.getBody();
             } else {
                 throw new RuntimeException("Failed to create course fee invoice");
             }

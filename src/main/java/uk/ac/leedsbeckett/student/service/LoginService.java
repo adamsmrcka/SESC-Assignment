@@ -34,7 +34,7 @@ public class LoginService {
     public String authenticate(String email, String password) {
         Login user = getByEmail(email);
         if (user != null) {
-            if(user.checkPassword(password)){
+            if (user.checkPassword(password)) {
                 return user.getStudentID();
             }
         }
@@ -57,8 +57,9 @@ public class LoginService {
         } while (loginRepository.existsByStudentID(studentID)); // Check if the ID already exists
         return studentID;
     }
+
     @Transactional
-    public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(RegistrationRequest request){
+    public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(RegistrationRequest request) {
         String studentId = registerUser(request.getPassword(), request.getForename(), request.getSurname(), request.getEmail(), request.getType());
         Student student = studentRepository.findStudentsByExternalStudentId(studentId);
 
@@ -76,7 +77,7 @@ public class LoginService {
     }
 
     @Transactional
-    public ResponseEntity<EntityModel<Student>> loginUserJson(RegistrationRequest request){
+    public ResponseEntity<EntityModel<Student>> loginUserJson(RegistrationRequest request) {
         String studentId = authenticate(request.getEmail(), request.getPassword());
         Student student = studentRepository.findStudentsByExternalStudentId(studentId);
         studentService.setCurrentUser(student);

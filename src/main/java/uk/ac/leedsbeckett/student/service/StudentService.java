@@ -1,20 +1,14 @@
 package uk.ac.leedsbeckett.student.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.leedsbeckett.student.controller.CourseController;
 import uk.ac.leedsbeckett.student.controller.StudentController;
-import uk.ac.leedsbeckett.student.model.Course;
-import uk.ac.leedsbeckett.student.model.Login;
 import uk.ac.leedsbeckett.student.model.Student;
 import uk.ac.leedsbeckett.student.model.StudentRepository;
-
-import javax.swing.text.html.parser.Entity;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -23,6 +17,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class StudentService {
     private Student student;
     private final StudentRepository studentRepository;
+
     @Autowired
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
@@ -57,7 +52,7 @@ public class StudentService {
         return studentRepository.findStudentsByExternalStudentId(studentID);
     }
 
-    public ResponseEntity<EntityModel<Student>> updateStudentJson(Student updateStudent){
+    public ResponseEntity<EntityModel<Student>> updateStudentJson(Student updateStudent) {
         updateStudent.setCoursesEnrolledIn(getCurrentUser().getCoursesEnrolledIn());
         Student updatedStudent = studentRepository.save(updateStudent);
         EntityModel<Student> entityModel = EntityModel.of(updatedStudent,
