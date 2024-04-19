@@ -14,6 +14,7 @@ import uk.ac.leedsbeckett.student.model.StudentRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -76,5 +77,22 @@ public class CourseService {
     return ResponseEntity
             .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
             .body(entityModel);
+    }
+
+    public ResponseEntity<String> deleteCourseByIdJson(Long courseId) {
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+        if (courseOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Course courseToDelete = courseOptional.get();
+        // Before deleting the course, make sure to remove this course from any students enrolled
+        Set<Student> studentsEnrolled = courseToDelete.getStudentsEnrolledInCourse();
+        for (Student student : studentsEnrolled) {
+            student.getCoursesEnrolledIn().remove(courseToDelete);
+        }
+
+        courseRepository.delete(courseToDelete);
+        return ResponseEntity.ok("Course deleted: " + courseToDelete.getTitle());
     }
 }

@@ -19,6 +19,8 @@ public class RegistrationController {
 
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private StudentService studentService;
 
 
     @PostMapping("/register")
@@ -29,6 +31,12 @@ public class RegistrationController {
     @PostMapping("/login")
     public ResponseEntity<EntityModel<Student>> checkLoginJson(@RequestBody RegistrationRequest request) {
         return loginService.loginUserJson(request);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        studentService.setCurrentUser(null);
+        return ResponseEntity.ok().build();
     }
 
 }

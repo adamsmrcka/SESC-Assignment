@@ -27,6 +27,7 @@ import java.util.Objects;
 public class PortalController {
 
     private final CourseRepository courseRepository;
+    private final LoginRepository loginRepository;
     private final StudentService studentService;
     private final EnrolmentService enrolmentService;
     private final CourseController courseController;
@@ -34,14 +35,12 @@ public class PortalController {
     private final RegistrationController registrationController;
     private final StudentController studentController;
     private final LoginService loginService;
-    private final IntegrationService integrationService;
-
     @Autowired
-    public PortalController(IntegrationService integrationService, StudentController studentController, LoginService loginService, CourseRepository courseRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
-        this.integrationService = integrationService;
+    public PortalController(StudentController studentController, LoginService loginService, CourseRepository courseRepository, LoginRepository loginRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
         this.studentController = studentController;
         this.loginService = loginService;
         this.courseRepository = courseRepository;
+        this.loginRepository = loginRepository;
         this.studentService = studentService;
         this.courseController = courseController;
         this.enrolmentController = enrolmentController;
@@ -59,12 +58,19 @@ public class PortalController {
         if (currentUser != null) {
             modelAndView.setViewName("main");
             modelAndView.addObject("currentUser", currentUser);
+
+            boolean isAdmin = false;  // Default to regular user
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                isAdmin = true;
+            }
+
+            modelAndView.addObject("isAdmin", isAdmin);
         } else {
             // Redirect to login page if user is not logged in
             RedirectView redirectView = new RedirectView("/login", true);
             modelAndView.setView(redirectView);
         }
-
         return modelAndView;
     }
 
@@ -105,7 +111,7 @@ public class PortalController {
                     modelAndView.setView(redirectView);
                 }
             } catch (Exception e) {
-                modelAndView.addObject("error", "Registration failed. Please try again.");
+                modelAndView.addObject("error", "Registration failed. Please try again." + e);
                 RedirectView redirectView = new RedirectView("/register", true);
                 modelAndView.setView(redirectView);
             }
@@ -167,6 +173,13 @@ public class PortalController {
         Student currentUser = studentService.getCurrentUser();
 
         if (currentUser != null) {
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                isAdmin = true;
+            }
+            modelAndView.addObject("isAdmin", isAdmin);
+
             CollectionModel<EntityModel<Course>> coursesModel = courseController.getAllCoursesJson();
             Collection<EntityModel<Course>> courses = coursesModel.getContent();
             modelAndView.setViewName("all-courses");
@@ -188,14 +201,28 @@ public class PortalController {
         Student currentUser = studentService.getCurrentUser();
 
         if (currentUser != null) {
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                isAdmin = true;
+            }
+            modelAndView.addObject("isAdmin", isAdmin);
+
             EntityModel<Course> responseEntity = courseController.getCourseJson(id);
             Course course = responseEntity.getContent();
             if (course != null) {
-                boolean isStudentEnrolled = enrolmentService.isStudentEnrolledInCourseWithId(currentUser, id);
-                modelAndView.setViewName("course-details");
-                modelAndView.addObject("course", course);
-                modelAndView.addObject("currentUser", currentUser);
-                modelAndView.addObject("isStudentEnrolled", isStudentEnrolled);
+                if (!isAdmin) {
+                    boolean isStudentEnrolled = enrolmentService.isStudentEnrolledInCourseWithId(currentUser, id);
+                    modelAndView.setViewName("course-details");
+                    modelAndView.addObject("course", course);
+                    modelAndView.addObject("currentUser", currentUser);
+                    modelAndView.addObject("isStudentEnrolled", isStudentEnrolled);
+                }
+                else {
+                    modelAndView.setViewName("course-details");
+                    modelAndView.addObject("course", course);
+                    modelAndView.addObject("currentUser", currentUser);
+                }
             } else {
                 // Course not found, redirect to all-courses
                 RedirectView redirectView = new RedirectView("/all-courses", true);
@@ -215,21 +242,29 @@ public class PortalController {
         ModelAndView modelAndView = new ModelAndView();
         Student currentUser = studentService.getCurrentUser();
         if (currentUser != null) {
-            // Retrieve invoice details from the model attributes
-            if (reference != null && date != null && amount != null) {
-                Invoice invoice = new Invoice();
-                invoice.setReference(reference);
-                invoice.setDueDate(date);
-                invoice.setAmount(amount);
-                modelAndView.setViewName("enrollment-success");
-                modelAndView.addObject("invoice", invoice);
-                modelAndView.addObject("currentUser", currentUser);
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                RedirectView redirectView = new RedirectView("/main", true);
+                modelAndView.setView(redirectView);
             }
             else {
-                // If no invoice details found, handle the error scenario gracefully
-                modelAndView.addObject("errorMessage", "No invoice details found");
-                RedirectView redirectView = new RedirectView("/enrollment-success", true);
-                modelAndView.setView(redirectView);
+                modelAndView.addObject("isAdmin", isAdmin);
+                // Retrieve invoice details from the model attributes
+                if (reference != null && date != null && amount != null) {
+                    Invoice invoice = new Invoice();
+                    invoice.setReference(reference);
+                    invoice.setDueDate(date);
+                    invoice.setAmount(amount);
+                    modelAndView.setViewName("enrollment-success");
+                    modelAndView.addObject("invoice", invoice);
+                    modelAndView.addObject("currentUser", currentUser);
+                } else {
+                    // If no invoice details found, handle the error scenario gracefully
+                    modelAndView.addObject("errorMessage", "No invoice details found");
+                    RedirectView redirectView = new RedirectView("/enrollment-success", true);
+                    modelAndView.setView(redirectView);
+                }
             }
         }
         else {
@@ -290,11 +325,20 @@ public class PortalController {
         Student currentUser = studentService.getCurrentUser();
 
         if (currentUser != null) {
-            CollectionModel<EntityModel<Course>> coursesModel = courseController.getEnrolledCoursesByStudentId(currentUser.getId());
-            Collection<EntityModel<Course>> courses = coursesModel.getContent();
-            modelAndView.setViewName("my-courses");
-            modelAndView.addObject("courses", courses);
-            modelAndView.addObject("currentUser", currentUser);
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                RedirectView redirectView = new RedirectView("/main", true);
+                modelAndView.setView(redirectView);
+            }
+            else {
+                modelAndView.addObject("isAdmin", isAdmin);
+                CollectionModel<EntityModel<Course>> coursesModel = courseController.getEnrolledCoursesByStudentId(currentUser.getId());
+                Collection<EntityModel<Course>> courses = coursesModel.getContent();
+                modelAndView.setViewName("my-courses");
+                modelAndView.addObject("courses", courses);
+                modelAndView.addObject("currentUser", currentUser);
+            }
         } else {
             // Redirect to login page if user is not logged in
             RedirectView redirectView = new RedirectView("/login", true);
@@ -311,6 +355,12 @@ public class PortalController {
         Student currentUser = studentService.getCurrentUser();
 
         if (currentUser != null) {
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                isAdmin = true;
+            }
+            modelAndView.addObject("isAdmin", isAdmin);
             modelAndView.setViewName("profile");
             modelAndView.addObject("currentUser", currentUser);
             modelAndView.addObject("student", currentUser);
@@ -335,18 +385,24 @@ public class PortalController {
         try {
             Student currentUser = studentService.getCurrentUser();
             if (currentUser != null) {
+                Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+                if (login != null && login.getType() == Login.UserType.ADMIN) {
+                }
                 updateStudent.setId(currentUser.getId());
                 updateStudent.setExternalStudentId(currentUser.getExternalStudentId());
                 ResponseEntity<EntityModel<Student>> responseEntity = studentController.updateStudentJson(updateStudent);
                 Student student = responseEntity.getBody().getContent();
 
                 if (student == null) {
-                    throw new RuntimeException("Enrollment failed. Please try again later.");
+                    RedirectView redirectView = new RedirectView("/profile", true);
+                    modelAndView.setView(redirectView);
                 }
-                studentService.setCurrentUser(student);
-                model.addAttribute("success", "Profile updated!");
-                RedirectView redirectView = new RedirectView("/profile", true);
-                modelAndView.setView(redirectView);
+                else {
+                    studentService.setCurrentUser(student);
+                    modelAndView.addObject("success", "Profile updated!");
+                    RedirectView redirectView = new RedirectView("/profile", true);
+                    modelAndView.setView(redirectView);
+                }
             }
             else {
                 // User not logged in, redirect to login page
@@ -354,7 +410,7 @@ public class PortalController {
                 modelAndView.setView(redirectView);
             }
         } catch (Exception e) {
-            model.addAttribute("error", "Profile update failed! Please try again.");
+            modelAndView.addObject("error", "Profile update failed! Please try again.");
             RedirectView redirectView = new RedirectView("/profile", true);
             modelAndView.setView(redirectView);
         }
@@ -370,19 +426,146 @@ public class PortalController {
         ResponseEntity<String> response = studentController.getGraduateEligibility(currentUser.getExternalStudentId());
         String eligibility = response.getBody();
         if (currentUser != null) {
-            if (Objects.equals(eligibility.toLowerCase(), "eligible")) {
-                    modelAndView.setViewName("graduation");
-                    modelAndView.addObject("currentUser", currentUser);
-                modelAndView.addObject("eligible", true);
+            boolean isAdmin = false;
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login != null && login.getType() == Login.UserType.ADMIN) {
+                RedirectView redirectView = new RedirectView("/main", true);
+                modelAndView.setView(redirectView);
             }
-                else if(Objects.equals(eligibility.toLowerCase(), "non-eligible")) {
-                modelAndView.addObject("eligible", false);
+            else {
+                modelAndView.addObject("isAdmin", isAdmin);
+                modelAndView.addObject("currentUser", currentUser);
+                if (Objects.equals(eligibility.toLowerCase(), "eligible")) {
+                    modelAndView.setViewName("graduation");
+                    modelAndView.addObject("eligible", true);
+                } else if (Objects.equals(eligibility.toLowerCase(), "non-eligible")) {
+                    modelAndView.addObject("eligible", false);
+                }
             }
         } else {
             // Redirect to login page if user is not logged in
             RedirectView redirectView = new RedirectView("/login", true);
             modelAndView.setView(redirectView);
         }
+        return modelAndView;
+    }
+    @GetMapping("/create-course")
+    public ModelAndView showCreateCourse(@RequestParam(name = "error", required = false) String error, @RequestParam(name = "success", required = false) String success) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Get current logged-in user
+        Student currentUser = studentService.getCurrentUser();
+
+        if (currentUser != null) {
+            Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+            if (login.getType() == Login.UserType.ADMIN) {
+                Course course = new Course();
+                modelAndView.setViewName("create-course");
+                modelAndView.addObject("currentUser", currentUser);
+                modelAndView.addObject("course", course);
+                modelAndView.addObject("isAdmin", true);
+                if (error != null) {
+                    modelAndView.addObject("error", error);
+                }
+                if (success != null) {
+                    modelAndView.addObject("success", success);
+                }
+            } else {
+                RedirectView redirectView = new RedirectView("/main", true);
+                modelAndView.setView(redirectView);
+            }
+
+        } else {
+            // Redirect to login page if user is not logged in
+            RedirectView redirectView = new RedirectView("/login", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+    @PostMapping("/delete-course")
+    public ModelAndView deleteCourse(@RequestParam("courseId") Long courseId) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            Student currentUser = studentService.getCurrentUser();
+            if (currentUser != null) {
+                boolean isAdmin = false;
+                Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+                if (login != null && login.getType() == Login.UserType.ADMIN) {
+                    isAdmin = true;
+                }
+                modelAndView.addObject("isAdmin", isAdmin);
+                ResponseEntity<String> responseEntity = courseController.deleteCourseJson(courseId);
+                String response = responseEntity.getBody();
+
+                if (response == null) {
+                    modelAndView.addObject("error", "Deleting a course failed! Please try again.");
+                    RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
+                    modelAndView.setView(redirectView);
+                }
+                else {
+                    modelAndView.addObject("success", "Course created!");
+                    RedirectView redirectView = new RedirectView("/all-courses", true);
+                    modelAndView.setView(redirectView);
+                }
+            }
+            else {
+                // User not logged in, redirect to login page
+                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.setView(redirectView);
+            }
+        } catch (Exception e) {
+            modelAndView.addObject("error", "Deleting a course failed! Please try again.");
+            RedirectView redirectView = new RedirectView("/course-details/" + courseId, true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+
+    @PostMapping("/create-course")
+    public ModelAndView createCourse(Model model, Course newCourse) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            Student currentUser = studentService.getCurrentUser();
+            if (currentUser != null) {
+                boolean isAdmin = false;
+                Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
+                if (login != null && login.getType() == Login.UserType.ADMIN) {
+                    isAdmin = true;
+                }
+                modelAndView.addObject("isAdmin", isAdmin);
+                ResponseEntity<EntityModel<Course>> responseEntity = courseController.createCourseJson(newCourse);
+                Course course = responseEntity.getBody().getContent();
+
+                if (course == null) {
+                    modelAndView.addObject("error", "Creating a new course failed! Please try again.");
+                    RedirectView redirectView = new RedirectView("/create-course", true);
+                    modelAndView.setView(redirectView);
+                }
+                else {
+                    modelAndView.addObject("success", "Course created!");
+                    RedirectView redirectView = new RedirectView("/create-course", true);
+                    modelAndView.setView(redirectView);
+                }
+            }
+            else {
+                // User not logged in, redirect to login page
+                RedirectView redirectView = new RedirectView("/login", true);
+                modelAndView.setView(redirectView);
+            }
+        } catch (Exception e) {
+            modelAndView.addObject("error", "Creating a new course failed! Please try again.");
+            RedirectView redirectView = new RedirectView("/create-course", true);
+            modelAndView.setView(redirectView);
+        }
+        return modelAndView;
+    }
+    @GetMapping("/sign-out")
+    public ModelAndView signOut() {
+        ModelAndView modelAndView = new ModelAndView();
+
+        registrationController.logout();
+        RedirectView redirectView = new RedirectView("/login", true);
+        modelAndView.setView(redirectView);
         return modelAndView;
     }
 }

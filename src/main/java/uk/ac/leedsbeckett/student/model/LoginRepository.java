@@ -9,6 +9,8 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
 
     Optional<Login> findByEmail(String email);
 
+    Login findByStudentID(String studentID);
+
     boolean existsByEmail(String email);
 
     boolean existsByStudentID(String studentID);

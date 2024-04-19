@@ -11,4 +11,12 @@ public class EnrolmentRequest {
     private Long studentId;
     private Long courseId;
 
+    public EnrolmentRequest(Long studentId, Long courseId) {
+        this.studentId = studentId;
+        this.courseId = courseId;
+    }
+
+    public EnrolmentRequest() {
+
+    }
 }

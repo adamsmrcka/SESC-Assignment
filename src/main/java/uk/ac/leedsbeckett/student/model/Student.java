@@ -45,6 +45,13 @@ public class Student {
     public Student() {
     }
 
+    public Student(long id, String externalStudentId, String forename, String surname) {
+        this.id = id;
+        this.externalStudentId = externalStudentId;
+        this.forename = forename;
+        this.surname = surname;
+    }
+
 
     @Transactional
     public void enrolInCourse(Course course) {

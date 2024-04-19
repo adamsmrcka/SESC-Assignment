@@ -101,13 +101,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/all-courses">All Courses</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:unless="${isAdmin}">
                     <a class="nav-link" href="/my-courses">My Courses</a>
+                </li>
+                <li class="nav-item" th:if="${isAdmin}">
+                    <a href="/create-course" class="nav-link">Create Course</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/profile">Student Profile</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:unless="${isAdmin}">
                     <a class="nav-link" href="/graduation">Graduation</a>
                 </li>
                 <li class="nav-item">

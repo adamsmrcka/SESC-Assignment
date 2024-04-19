@@ -1,0 +1,2 @@
+INSERT INTO STUDENT (ID, externalStudentId, surname, FORENAME) VALUES (1, 'c3922382', 'Adam', 'Smrcka');
+INSERT INTO STUDENT (ID, externalStudentId, surname, FORENAME) VALUES (2, 'c3781247', 'Micky', 'Mouse');

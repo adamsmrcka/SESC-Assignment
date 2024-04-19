@@ -46,9 +46,13 @@ public class CourseController {
         return courseService.getEnrolledCoursesByStudentIdJson(id);
     }
 
-    @PostMapping("/courses")
-    ResponseEntity<EntityModel<Course>> createCourseJson(@RequestBody Course newCourse){
+    @PostMapping("/courses/new")
+    public ResponseEntity<EntityModel<Course>> createCourseJson(@RequestBody Course newCourse){
         return courseService.createNewCourseJson(newCourse);
+    }
+    @PostMapping("/courses/delete/{id}")
+    public ResponseEntity<String> deleteCourseJson(@PathVariable Long id){
+        return courseService.deleteCourseByIdJson(id);
     }
 
 }

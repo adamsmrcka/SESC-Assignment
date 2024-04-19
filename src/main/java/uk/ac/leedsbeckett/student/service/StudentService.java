@@ -42,8 +42,14 @@ public class StudentService {
     }
 
     @Transactional
-    public void setCurrentUser(Student stud) {
-        this.student = studentRepository.findStudentById(stud.getId());
+    public void setCurrentUser(Student student) {
+        if (student == null) {
+            this.student = null; // Reset the current user to null
+        } else {
+            // Retrieve the student from the database by ID
+            this.student = studentRepository.findById(student.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Student not found with id: " + student.getId()));
+        }
     }
 
     @Transactional

@@ -93,13 +93,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/all-courses">All Courses</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:unless="${isAdmin}">
                     <a class="nav-link" href="/my-courses">My Courses</a>
+                </li>
+                <li class="nav-item" th:if="${isAdmin}">
+                    <a href="/create-course" class="nav-link">Create Course</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/profile">Student Profile</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:unless="${isAdmin}">
                     <a class="nav-link" href="/graduation">Graduation</a>
                 </li>
                 <li class="nav-item">
@@ -114,8 +117,8 @@
     <h1>Enrollment Successful!</h1>
     <p>Your External ID: <strong th:text="${currentUser.externalStudentId}"></strong></p>
     <p>Reference Number: <strong th:text="${invoice.reference}"></strong></p>
-    <p>Amount: <strong th:text="${invoice.amount}"></strong></p>
-    <p>Due Date: £<strong th:text="${invoice.dueDate}"></strong></p>
+    <p>Amount: £<strong th:text="${invoice.amount}"></strong></p>
+    <p>Due Date: <strong th:text="${invoice.dueDate}"></strong></p>
     <div class="btn-container">
         <a href="/all-courses" class="btn btn-primary">View All Courses</a>
         <a href="http://localhost:8081/portal" class="btn btn-secondary">Pay Invoice</a>
