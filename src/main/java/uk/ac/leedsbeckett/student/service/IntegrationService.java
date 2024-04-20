@@ -58,11 +58,8 @@ public class IntegrationService {
         HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
         // Send POST request to register the student account
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(
+        return restTemplate.postForEntity(
                 "http://localhost:80/api/register", requestEntity, Void.class);
-
-        // Return response
-        return responseEntity;
     }
 
     /**

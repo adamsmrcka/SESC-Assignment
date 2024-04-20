@@ -110,7 +110,7 @@ public class CourseControllerTest {
     @Test
     public void testCreateCourseJson() {
         // Create a mock new course
-        Course newCourse = new Course("Modul1", "Sesc", "TestCourse 1", 200);;
+        Course newCourse = new Course("Modul1", "Sesc", "TestCourse 1", 200);
         // Mock CourseService behavior
         Course savedCourse = new Course("Modul2", "TT", "TestCourse 2", 12345);
         when(courseService.createNewCourseJson(newCourse)).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(savedCourse)));
