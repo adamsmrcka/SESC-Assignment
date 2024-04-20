@@ -6,13 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
 import uk.ac.leedsbeckett.student.controller.EnrolmentController;
 import uk.ac.leedsbeckett.student.model.Invoice;
 import uk.ac.leedsbeckett.student.service.EnrolmentService;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 

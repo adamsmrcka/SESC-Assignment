@@ -2,9 +2,6 @@ package uk.ac.leedsbeckett.student.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
 import uk.ac.leedsbeckett.student.model.*;

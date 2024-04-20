@@ -1,18 +1,12 @@
 package uk.ac.leedsbeckett.student.controller;
 
-import org.hibernate.metamodel.mapping.EntityValuedModelPart;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import uk.ac.leedsbeckett.student.model.Account;
-import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.Student;
 import uk.ac.leedsbeckett.student.service.IntegrationService;
 import uk.ac.leedsbeckett.student.service.StudentService;
-
-import javax.swing.text.html.parser.Entity;
 
 /**
  * Controller class for handling student-related operations via RESTful endpoints

@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.controller.RegistrationController;
 import uk.ac.leedsbeckett.student.model.Student;

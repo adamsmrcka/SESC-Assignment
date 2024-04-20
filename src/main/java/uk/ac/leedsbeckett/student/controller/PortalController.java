@@ -460,9 +460,6 @@ public class PortalController {
         try {
             Student currentUser = studentService.getCurrentUser();
             if (currentUser != null) {
-                Login login = loginRepository.findByStudentID(currentUser.getExternalStudentId());
-                if (login != null && login.getType() == Login.UserType.ADMIN) {
-                }
                 updateStudent.setId(currentUser.getId());
                 updateStudent.setExternalStudentId(currentUser.getExternalStudentId());
                 ResponseEntity<EntityModel<Student>> responseEntity = studentController.updateStudentJson(updateStudent);
