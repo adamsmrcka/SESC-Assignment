@@ -19,6 +19,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Controller class managing portal-related operations and endpoints
+ */
 @RestController
 public class PortalController {
 
@@ -32,6 +35,18 @@ public class PortalController {
     private final StudentController studentController;
     private final LoginService loginService;
 
+    /**
+     * Constructor to initialize PortalController with required dependencies
+     * @param studentController     StudentController instance
+     * @param loginService          LoginService instance
+     * @param courseRepository      CourseRepository instance
+     * @param loginRepository       LoginRepository instance
+     * @param studentService        StudentService instance
+     * @param courseController      CourseController instance
+     * @param enrolmentController   EnrolmentController instance
+     * @param enrolmentService      EnrolmentService instance
+     * @param registrationController RegistrationController instance
+     */
     @Autowired
     public PortalController(StudentController studentController, LoginService loginService, CourseRepository courseRepository, LoginRepository loginRepository, StudentService studentService, CourseController courseController, EnrolmentController enrolmentController, EnrolmentService enrolmentService, RegistrationController registrationController) {
         this.studentController = studentController;
@@ -45,6 +60,10 @@ public class PortalController {
         this.registrationController = registrationController;
     }
 
+    /**
+     * Endpoint to display the main portal page
+     * @return ModelAndView representing the main page view
+     */
     @GetMapping("/main")
     public ModelAndView homePage() {
         ModelAndView modelAndView = new ModelAndView();
@@ -71,6 +90,11 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display the registration page
+     * @param error Error message to display on registration page (optional)
+     * @return ModelAndView representing the registration page
+     */
     @GetMapping("/register")
     public ModelAndView register(@RequestParam(name = "error", required = false) String error) {
         ModelAndView modelAndView = new ModelAndView("register");
@@ -81,6 +105,15 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to process user registration
+     * @param model    Model object to add attributes
+     * @param email    Email address of the user
+     * @param forename First name of the user
+     * @param surname  Last name of the user
+     * @param password Password chosen by the user
+     * @return ModelAndView representing the result of registration
+     */
     @PostMapping("/register")
     public ModelAndView processRegistration(Model model, @RequestParam String email, @RequestParam String forename, @RequestParam String surname, @RequestParam String password) {
         ModelAndView modelAndView = new ModelAndView();
@@ -115,7 +148,11 @@ public class PortalController {
         return modelAndView;
     }
 
-
+    /**
+     * Endpoint to display the registration success page
+     * @param studentID ID of the registered student
+     * @return ModelAndView representing the registration success page
+     */
     @GetMapping("/registrationSuccess")
     public ModelAndView registrationSuccess(@RequestParam String studentID) {
         ModelAndView modelAndView = new ModelAndView("registrationsuccess");
@@ -123,6 +160,10 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display the login page
+     * @return ModelAndView representing the login page
+     */
     @GetMapping("/login")
     public ModelAndView logIn() {
         ModelAndView modelAndView = new ModelAndView("login");
@@ -130,6 +171,13 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to process user login
+     * @param model   Model object to add attributes
+     * @param email   Email address of the user
+     * @param password Password entered by the user
+     * @return ModelAndView representing the result of login
+     */
     @PostMapping("/login")
     public ModelAndView processLogin(Model model, @RequestParam String email, @RequestParam String password) {
         ModelAndView modelAndView = new ModelAndView();
@@ -160,8 +208,12 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display all courses available
+     * @return ModelAndView representing the page displaying all courses
+     */
     @GetMapping("/all-courses")
-    public ModelAndView showAllCourses(Model model) {
+    public ModelAndView showAllCourses() {
         ModelAndView modelAndView = new ModelAndView();
 
         // Get current logged-in user
@@ -188,8 +240,13 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display details of a specific course
+     * @param id    ID of the course to display
+     * @return ModelAndView representing the course details page
+     */
     @GetMapping("/course-details/{id}")
-    public ModelAndView showCourseDetails(@PathVariable Long id, Model model) {
+    public ModelAndView showCourseDetails(@PathVariable Long id) {
         ModelAndView modelAndView = new ModelAndView();
 
         // Get current logged-in user
@@ -231,6 +288,13 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display enrollment success with invoice details
+     * @param reference Reference of the invoice
+     * @param date      Due date of the invoice
+     * @param amount    Amount of the invoice
+     * @return ModelAndView representing the enrollment success page
+     */
     @GetMapping("/enrollment-success")
     public ModelAndView showEnrollmentSuccess(@RequestParam("reference") String reference, @RequestParam("dueDate") LocalDate date, @RequestParam("amount") Double amount) {
         ModelAndView modelAndView = new ModelAndView();
@@ -266,6 +330,11 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to process student enrollment in a course
+     * @param courseId ID of the course to enroll in
+     * @return ModelAndView representing the result of the enrollment
+     */
     @PostMapping("/enrol")
     public ModelAndView enrollStudent(@RequestParam("courseId") Long courseId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -276,10 +345,9 @@ public class PortalController {
                 EnrolmentRequest request = new EnrolmentRequest();
                 request.setStudentId(currentUser.getId()); // Set the current user as the student
                 request.setCourseId(course.getId());
-                ResponseEntity<Invoice> responseEntity = enrolmentController.enrolStudentJson(request);
-                Invoice invoice = responseEntity.getBody();
+                EntityModel<Invoice> responseEntity = enrolmentController.enrolStudentJson(request);
+                Invoice invoice = responseEntity.getContent();
 
-                //enrolmentService.enrolStudentInCourse(currentUser, course);
                 if (invoice == null) {
                     throw new RuntimeException("Enrollment failed. Please try again later.");
                 }
@@ -310,8 +378,12 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display courses enrolled by the current user
+     * @return ModelAndView representing the page displaying user's enrolled courses
+     */
     @GetMapping("/my-courses")
-    public ModelAndView showMyCourses(Model model) {
+    public ModelAndView showMyCourses() {
         ModelAndView modelAndView = new ModelAndView();
 
         // Get current logged-in user
@@ -339,6 +411,12 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display the user's profile
+     * @param error   Optional error message
+     * @param success Optional success message
+     * @return ModelAndView representing the user's profile page
+     */
     @GetMapping("/profile")
     public ModelAndView showMyProfile(@RequestParam(name = "error", required = false) String error, @RequestParam(name = "success", required = false) String success) {
         ModelAndView modelAndView = new ModelAndView();
@@ -371,8 +449,13 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to update the user's profile
+     * @param updateStudent Updated Student object containing profile updates
+     * @return ModelAndView representing the result of the profile update
+     */
     @PostMapping("/profile")
-    public ModelAndView updateStudent(Model model, Student updateStudent) {
+    public ModelAndView updateStudent(Student updateStudent) {
         ModelAndView modelAndView = new ModelAndView();
         try {
             Student currentUser = studentService.getCurrentUser();
@@ -407,6 +490,10 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to check graduation eligibility and display graduation status
+     * @return ModelAndView representing the graduation status page
+     */
     @GetMapping("/graduation")
     public ModelAndView showGraduation() {
         ModelAndView modelAndView = new ModelAndView();
@@ -439,6 +526,12 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to display the course creation page
+     * @param error   Optional error message
+     * @param success Optional success message
+     * @return ModelAndView representing the course creation page
+     */
     @GetMapping("/create-course")
     public ModelAndView showCreateCourse(@RequestParam(name = "error", required = false) String error, @RequestParam(name = "success", required = false) String success) {
         ModelAndView modelAndView = new ModelAndView();
@@ -473,6 +566,11 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to delete a course
+     * @param courseId ID of the course to be deleted
+     * @return ModelAndView representing the result of the deletion operation
+     */
     @PostMapping("/delete-course")
     public ModelAndView deleteCourse(@RequestParam("courseId") Long courseId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -510,8 +608,13 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to create a new course
+     * @param newCourse New Course object containing course details
+     * @return ModelAndView representing the result of the course creation
+     */
     @PostMapping("/create-course")
-    public ModelAndView createCourse(Model model, Course newCourse) {
+    public ModelAndView createCourse(Course newCourse) {
         ModelAndView modelAndView = new ModelAndView();
         try {
             Student currentUser = studentService.getCurrentUser();
@@ -547,6 +650,10 @@ public class PortalController {
         return modelAndView;
     }
 
+    /**
+     * Endpoint to sign out the current user
+     * @return ModelAndView representing the sign-out operation
+     */
     @GetMapping("/sign-out")
     public ModelAndView signOut() {
         ModelAndView modelAndView = new ModelAndView();

@@ -13,16 +13,29 @@ import uk.ac.leedsbeckett.student.model.StudentRepository;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Service class responsible for managing student-related operations
+ */
 @Component
 public class StudentService {
     private Student student;
     private final StudentRepository studentRepository;
 
+    /**
+     * Constructs a new StudentService with the specified StudentRepository
+     * @param studentRepository The repository for student data access
+     */
     @Autowired
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
+    /**
+     * Retrieves a student by ID and creates an EntityModel representing the student with self-link
+     * @param id The ID of the student to retrieve
+     * @return EntityModel representing the retrieved student
+     * @throws RuntimeException if the student with the specified ID is not found
+     */
     public EntityModel<Student> getStudentByIdJson(Long id) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course with id " + id + "not found."));
@@ -31,11 +44,20 @@ public class StudentService {
                         .getStudentJson(student.getId())).withSelfRel());
     }
 
+    /**
+     * Retrieves the current authenticated user (student)
+     * @return The current authenticated user (student)
+     */
     @Transactional
     public Student getCurrentUser() {
         return this.student;
     }
 
+    /**
+     * Sets the current authenticated user (student)
+     * @param student The student to set as the current authenticated user
+     * @throws IllegalArgumentException if the specified student is not found in the database
+     */
     @Transactional
     public void setCurrentUser(Student student) {
         if (student == null) {
@@ -46,12 +68,11 @@ public class StudentService {
                     .orElseThrow(() -> new IllegalArgumentException("Student not found with id: " + student.getId()));
         }
     }
-
-    @Transactional
-    public Student getStudentByExternalStudentId(String studentID) {
-        return studentRepository.findStudentsByExternalStudentId(studentID);
-    }
-
+    /**
+     * Updates a student's information and returns the updated EntityModel with self-link
+     * @param updateStudent The updated student information
+     * @return ResponseEntity containing the updated EntityModel of the student
+     */
     public ResponseEntity<EntityModel<Student>> updateStudentJson(Student updateStudent) {
         updateStudent.setCoursesEnrolledIn(getCurrentUser().getCoursesEnrolledIn());
         Student updatedStudent = studentRepository.save(updateStudent);

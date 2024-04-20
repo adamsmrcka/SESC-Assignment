@@ -10,13 +10,19 @@ import org.springframework.context.annotation.Configuration;
 import uk.ac.leedsbeckett.student.model.*;
 import uk.ac.leedsbeckett.student.service.LoginService;
 
-
+/**
+ * Configuration class responsible for inserting initial data into the database using CommandLineRunner
+ */
 @Configuration
 public class DataInsertionConfiguration {
 
-    @Autowired
-    private LoginService loginService;
-
+    /**
+     * Creates a CommandLineRunner bean to execute data insertion operations on application startup
+     * @param studentRepository The repository for student data access
+     * @param courseRepository  The repository for course data access
+     * @param loginRepository   The repository for login data access
+     * @return CommandLineRunner instance to insert initial data into the database
+     */
     @Bean
     public CommandLineRunner dataLoader(StudentRepository studentRepository,
                                         CourseRepository courseRepository,
@@ -27,7 +33,6 @@ public class DataInsertionConfiguration {
             @Override
             public void run(String... args) throws Exception {
 
-                // Insert 2 students and their login details
                 List<Login> logins = Arrays.asList(
                         new Login("test22@gmail.com", "c3922382", "password", Login.UserType.USER),
                         new Login("test2@gmail.com", "c3781247", "password", Login.UserType.ADMIN));
@@ -37,7 +42,7 @@ public class DataInsertionConfiguration {
                         new Student("c3922382", "Adam", "Smrcka"),
                         new Student("c3781247", "Micky", "Mouse"));
                 studentRepository.saveAll(students);
-                // Inserting all courses
+
                 List<Course> courses = Arrays.asList(
                         new Course("Introduction to Programming", "CS101", "Learn basic programming concepts and logic.", 1000),
                         new Course("Database Management", "DBMS202", "Study database design and SQL.", 1200),

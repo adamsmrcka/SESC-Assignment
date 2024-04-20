@@ -19,24 +19,40 @@ import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+/**
+ * Service class responsible for managing course-related operations
+ */
 @Service
 public class CourseService {
 
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
 
+    /**
+     * Constructor for CourseService class
+     * @param courseRepository Repository for accessing course data
+     * @param studentRepository Repository for accessing student data
+     */
     @Autowired
     public CourseService(CourseRepository courseRepository, StudentRepository studentRepository) {
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
     }
 
+    /**
+     * Retrieves a course by its ID
+     * @param id The ID of the course to retrieve
+     * @return The course if found, otherwise null
+     */
     public Course getCourseById(Long id) {
         Optional<Course> courseOptional = courseRepository.findById(id);
         return courseOptional.orElse(null);
     }
 
+    /**
+     * Retrieves all courses in JSON format
+     * @return CollectionModel containing EntityModels of all courses
+     */
     public CollectionModel<EntityModel<Course>> getAllCoursesJson() {
         List<EntityModel<Course>> courseList = courseRepository.findAll()
                 .stream()
@@ -47,6 +63,12 @@ public class CourseService {
                 .withSelfRel());
     }
 
+    /**
+     * Retrieves a course by its ID in JSON format
+     * @param id The ID of the course to retrieve
+     * @return EntityModel representing the course
+     * @throws RuntimeException if the course with the specified ID is not found
+     */
     public EntityModel<Course> getCourseByIdJson(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course with id " + id + " not found."));
@@ -55,7 +77,12 @@ public class CourseService {
                 linkTo(methodOn(CourseController.class).getAllCoursesJson()).withRel("courses"));
     }
 
-
+    /**
+     * Retrieves the enrolled courses of a student by their ID in JSON format
+     * @param studentId The ID of the student whose enrolled courses are to be retrieved
+     * @return CollectionModel containing EntityModels of the enrolled courses of the student
+     * @throws RuntimeException if no student is found with the specified ID
+     */
     public CollectionModel<EntityModel<Course>> getEnrolledCoursesByStudentIdJson(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
@@ -69,6 +96,11 @@ public class CourseService {
                 .withSelfRel());
     }
 
+    /**
+     * Creates a new course and returns a ResponseEntity containing the created course in JSON format
+     * @param newCourse The new course to create
+     * @return ResponseEntity containing the created course as an EntityModel
+     */
     public ResponseEntity<EntityModel<Course>> createNewCourseJson(Course newCourse) {
         Course savedCourse = courseRepository.save(newCourse);
         EntityModel<Course> entityModel = EntityModel.of(savedCourse,
@@ -79,6 +111,11 @@ public class CourseService {
                 .body(entityModel);
     }
 
+    /**
+     * Deletes a course by its ID and returns a ResponseEntity indicating the deletion status
+     * @param courseId The ID of the course to delete
+     * @return ResponseEntity containing a message indicating the deletion status
+     */
     public ResponseEntity<String> deleteCourseByIdJson(Long courseId) {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
         if (courseOptional.isEmpty()) {

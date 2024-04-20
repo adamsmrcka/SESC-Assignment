@@ -33,9 +33,19 @@ public class Student {
     @ToString.Exclude
     Set<Course> coursesEnrolledIn;
 
+    /**
+     * Student constructor with no fields
+     */
     public Student() {
     }
 
+    /**
+     * Student Constructor with all fields
+     * @param id ID
+     * @param externalStudentId Student ID
+     * @param forename Forename
+     * @param surname Surname
+     */
     public Student(long id, String externalStudentId, String forename, String surname) {
         this.id = id;
         this.externalStudentId = externalStudentId;
@@ -43,7 +53,22 @@ public class Student {
         this.surname = surname;
     }
 
+    /**
+     * Student Constructor without an ID
+     * @param externalStudentId Student ID
+     * @param forename Forename
+     * @param surname Surname
+     */
+    public Student(String externalStudentId, String forename, String surname) {
+        this.externalStudentId = externalStudentId;
+        this.forename = forename;
+        this.surname = surname;
+    }
 
+    /**
+     * Enrols student into a course
+     * @param course Course
+     */
     @Transactional
     public void enrolInCourse(Course course) {
         if (coursesEnrolledIn == null) {
@@ -56,11 +81,4 @@ public class Student {
             course.getStudentsEnrolledInCourse().add(this);
         }
     }
-
-    public Student(String externalStudentId, String forename, String surname) {
-        this.externalStudentId = externalStudentId;
-        this.forename = forename;
-        this.surname = surname;
-    }
-
 }

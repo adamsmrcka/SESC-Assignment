@@ -12,7 +12,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
-
+/**
+ * Represents a Course with basic information.
+ */
 @Entity
 @Table(name = "COURSE_TBL")
 @Setter
@@ -34,6 +36,13 @@ public class Course {
     Set<Student> studentsEnrolledInCourse;
 
 
+    /**
+     * Course Constructor with all fields
+     * @param title Title of the course
+     * @param abbreviation Abbreviation of the course
+     * @param description Course Description
+     * @param fee Course Fee in £
+     */
     public Course(String title, String abbreviation, String description, double fee) {
         this.title = title;
         this.abbreviation = abbreviation;

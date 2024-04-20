@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.ac.leedsbeckett.student.Request.EnrolmentRequest;
@@ -35,36 +36,20 @@ public class EnrolmentControllerTest{
         EnrolmentRequest enrolmentRequest = new EnrolmentRequest(1L, 1L);
 
         // Create a mock Invoice response
+        EnrolmentService enrolmentService = mock(EnrolmentService.class);
         Invoice mockInvoice = new Invoice();
         mockInvoice.setAmount(100.0); // Set invoice amount for verification
 
         // Mock EnrolmentService behavior
         when(enrolmentService.enrolStudentInCourse(enrolmentRequest)).thenReturn(mockInvoice);
 
+        EnrolmentController enrolmentController = new EnrolmentController(enrolmentService);
+
         // Call the controller method
-        ResponseEntity<Invoice> response = enrolmentController.enrolStudentJson(enrolmentRequest);
+        EntityModel<Invoice> response = enrolmentController.enrolStudentJson(enrolmentRequest);
 
         // Verify the response status and content
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockInvoice, response.getBody());
-
-        // Verify that enrolStudentInCourse was called with the correct EnrolmentRequest
-        verify(enrolmentService, times(1)).enrolStudentInCourse(enrolmentRequest);
-    }
-
-    @Test
-    public void testEnrolStudentJson_NoContent() {
-        // Create a mock EnrolmentRequest
-        EnrolmentRequest enrolmentRequest = new EnrolmentRequest(1L, 1L);
-
-        // Mock EnrolmentService behavior to return null (no invoice)
-        when(enrolmentService.enrolStudentInCourse(enrolmentRequest)).thenReturn(null);
-
-        // Call the controller method
-        ResponseEntity<Invoice> response = enrolmentController.enrolStudentJson(enrolmentRequest);
-
-        // Verify the response status
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(mockInvoice, response.getContent());
 
         // Verify that enrolStudentInCourse was called with the correct EnrolmentRequest
         verify(enrolmentService, times(1)).enrolStudentInCourse(enrolmentRequest);

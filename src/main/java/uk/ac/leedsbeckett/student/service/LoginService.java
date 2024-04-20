@@ -14,15 +14,24 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Service component for handling user authentication, registration, and login operations
+ */
 @Component
 public class LoginService {
 
-    private Student student;
     private final LoginRepository loginRepository;
     private final StudentRepository studentRepository;
     private final IntegrationService integrationService;
     private final StudentService studentService;
 
+    /**
+     * Constructor for LoginService.
+     * @param studentService     Service for student-related operations
+     * @param loginRepository    Repository for accessing login data
+     * @param studentRepository  Repository for accessing student data
+     * @param integrationService Service for integrating with external systems
+     */
     public LoginService(StudentService studentService, LoginRepository loginRepository, StudentRepository studentRepository, IntegrationService integrationService) {
         this.loginRepository = loginRepository;
         this.studentRepository = studentRepository;
@@ -30,6 +39,12 @@ public class LoginService {
         this.studentService = studentService;
     }
 
+    /**
+     * Authenticates a user with the provided email and password
+     * @param email    The email of the user to authenticate
+     * @param password The password of the user
+     * @return The student ID if authentication is successful, otherwise null
+     */
     @Transactional
     public String authenticate(String email, String password) {
         Login user = getByEmail(email);
@@ -41,12 +56,21 @@ public class LoginService {
         return null;
     }
 
+    /**
+     * Retrieves a user by their email
+     * @param email The email of the user to retrieve
+     * @return The Login object representing the user, or null if not found
+     */
     @Transactional
     public Login getByEmail(String email) {
         Optional<Login> optionalLogin = loginRepository.findByEmail(email);
         return optionalLogin.orElse(null);
     }
 
+    /**
+     * Generates a unique student ID
+     * @return A unique student ID
+     */
     @Transactional
     public String generateUniqueStudentID() {
         Random random = new Random();
@@ -58,6 +82,11 @@ public class LoginService {
         return studentID;
     }
 
+    /**
+     * Creates a new student based on the provided registration request
+     * @param request The RegistrationRequest containing user details for registration
+     * @return ResponseEntity containing the EntityModel of the newly created student
+     */
     @Transactional
     public ResponseEntity<EntityModel<Student>> CreateNewStudentJson(RegistrationRequest request) {
         String studentId = registerUser(request.getPassword(), request.getForename(), request.getSurname(), request.getEmail(), request.getType());
@@ -76,6 +105,11 @@ public class LoginService {
                 .body(entityModel);
     }
 
+    /**
+     * Logs in a user (student) with the provided registration request
+     * @param request The RegistrationRequest containing user credentials
+     * @return ResponseEntity containing the EntityModel of the logged-in student
+     */
     @Transactional
     public ResponseEntity<EntityModel<Student>> loginUserJson(RegistrationRequest request) {
         String studentId = authenticate(request.getEmail(), request.getPassword());
@@ -95,6 +129,16 @@ public class LoginService {
                 .body(entityModel);
     }
 
+    /**
+     * Registers a new user
+     * @param password The password for the new user
+     * @param forename The forename (first name) of the new user
+     * @param surname  The surname (last name) of the new user
+     * @param email    The email address of the new user
+     * @param type     The type of the user (e.g., 'student', 'admin')
+     * @return The studentID of the registered user
+     * @throws RuntimeException if registration fails
+     */
     @Transactional
     public String registerUser(String password, String forename, String surname, String email, String type) {
         // Generate a unique studentID
@@ -132,7 +176,11 @@ public class LoginService {
         }
     }
 
-
+    /**
+     * Checks if a user with the given email already exists
+     * @param email The email to check
+     * @return true if the email exists, false otherwise
+     */
     @Transactional
     public boolean emailExists(String email) {
         Login user = getByEmail(email);

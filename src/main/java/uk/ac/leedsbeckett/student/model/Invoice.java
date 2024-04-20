@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * Represents an Invoice with basic information.
+ */
 @Data
 public class Invoice {
     private Long id;
@@ -14,11 +17,17 @@ public class Invoice {
     private Status status;
     private Account account;
 
+    /**
+     * Invoice fee type
+     */
     public enum Type {
         LIBRARY_FINE,
         TUITION_FEES
     }
 
+    /**
+     * Invoice Status
+     */
     enum Status {
         OUTSTANDING,
         PAID,
