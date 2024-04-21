@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.service;
+package uk.ac.leedsbeckett.student.uniTests.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +12,7 @@ import uk.ac.leedsbeckett.student.controller.CourseController;
 import uk.ac.leedsbeckett.student.model.Course;
 import uk.ac.leedsbeckett.student.model.CourseRepository;
 import uk.ac.leedsbeckett.student.model.StudentRepository;
+import uk.ac.leedsbeckett.student.service.CourseService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the CourseService class.
+ */
 class CourseServiceTest {
     @Mock
     private CourseRepository courseRepository;
@@ -39,6 +43,9 @@ class CourseServiceTest {
     void tearDown() {
     }
 
+    /**
+     * Test case for retrieving all courses in JSON format.
+     */
     @Test
     void getAllCoursesJson() {
         // Mocking a Course object with ID 1

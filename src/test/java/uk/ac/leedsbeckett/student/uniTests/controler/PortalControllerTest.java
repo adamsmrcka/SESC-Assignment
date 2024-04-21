@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.controler;
+package uk.ac.leedsbeckett.student.uniTests.controler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,9 @@ import uk.ac.leedsbeckett.student.service.StudentService;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
+/**
+ * Unit tests for the PortalController class.
+ */
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = PortalController.class)
 @AutoConfigureMockMvc
@@ -70,6 +72,10 @@ public class PortalControllerTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+    /**
+     * Test case for verifying the home page.
+     */
     @Test
     public void testHomePage() throws Exception {
         // Mock current user
@@ -85,7 +91,9 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.view().name("main"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("currentUser"));
     }
-
+    /**
+     * Test case for accessing the registration page.
+     */
     @Test
     public void testRegister() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/register"))
@@ -94,6 +102,9 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.model().attributeExists("registrationRequest"));
     }
 
+    /**
+     * Test case for processing registration.
+     */
     @Test
     public void testProcessRegistration() throws Exception {
         RegistrationRequest request = new RegistrationRequest();
@@ -118,6 +129,10 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/registrationSuccess?studentID=c123"));
     }
+
+    /**
+     * Test case for verifying registration success page.
+     */
     @Test
     public void testRegistrationSuccess() throws Exception {
         String studentId = "123";
@@ -128,6 +143,10 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.view().name("registrationsuccess"))
                 .andExpect(MockMvcResultMatchers.model().attribute("studentID", studentId));
     }
+
+    /**
+     * Test case for accessing the login page.
+     */
     @Test
     public void testLogIn() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/login"))
@@ -136,6 +155,9 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.model().attributeExists("registrationRequest"));
     }
 
+    /**
+     * Test case for processing login with valid credentials.
+     */
     @Test
     public void testProcessLogin_ValidCredentials() throws Exception {
         String email = "test@example.com";
@@ -152,6 +174,9 @@ public class PortalControllerTest {
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/main"));
     }
 
+    /**
+     * Test case for processing login with invalid credentials.
+     */
     @Test
     public void testProcessLogin_InvalidCredentials() throws Exception {
         String email = "invalid@example.com";

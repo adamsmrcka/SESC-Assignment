@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.controler;
+package uk.ac.leedsbeckett.student.uniTests.controler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,21 +12,19 @@ import uk.ac.leedsbeckett.student.model.Invoice;
 import uk.ac.leedsbeckett.student.service.EnrolmentService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-
+/**
+ * Unit tests for the EnrolmentController class.
+ */
 public class EnrolmentControllerTest{
-
-    @Mock
-    private EnrolmentService enrolmentService;
-
-    @InjectMocks
-    private EnrolmentController enrolmentController;
-
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Test case for successful enrollment of a student.
+     */
     @Test
     public void testEnrolStudentJson_Success() {
         // Create a mock EnrolmentRequest

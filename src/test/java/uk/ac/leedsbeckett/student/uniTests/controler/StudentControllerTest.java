@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.controler;
+package uk.ac.leedsbeckett.student.uniTests.controler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for the StudentController class.
+ */
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(StudentController.class)
 @AutoConfigureMockMvc
-public class StudentControllerIntegrationTest {
+public class StudentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,6 +50,11 @@ public class StudentControllerIntegrationTest {
         objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Test retrieving a student by ID.
+     *
+     * @throws Exception if there is an error performing the request or assertions fail
+     */
     @Test
     public void testGetStudentById() throws Exception {
 
@@ -64,6 +72,11 @@ public class StudentControllerIntegrationTest {
 
     }
 
+    /**
+     * Test updating a student.
+     *
+     * @throws Exception if there is an error performing the request or assertions fail
+     */
     @Test
     public void testUpdateStudent() throws Exception {
         Student updatedStudent = new Student(1L, "c123545", "John", "Doe");
@@ -82,6 +95,11 @@ public class StudentControllerIntegrationTest {
 
     }
 
+    /**
+     * Test retrieving graduate eligibility for a student.
+     *
+     * @throws Exception if there is an error performing the request or assertions fail
+     */
     @Test
     public void testGetGraduateEligibility() throws Exception {
         String studentId = "123";

@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.service;
+package uk.ac.leedsbeckett.student.uniTests.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.model.*;
+import uk.ac.leedsbeckett.student.service.IntegrationService;
+import uk.ac.leedsbeckett.student.service.LoginService;
+import uk.ac.leedsbeckett.student.service.StudentService;
 
 import java.net.URI;
 import java.util.Optional;
@@ -21,6 +24,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the LoginService class.
+ */
 @ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
 class LoginServiceTest {
@@ -46,6 +52,9 @@ class LoginServiceTest {
     void tearDown() {
     }
 
+    /**
+     * Test case for authenticating a user with valid credentials.
+     */
     @Test
     void authenticate() {
         String email = "test@example.com";
@@ -61,6 +70,9 @@ class LoginServiceTest {
         assertEquals("123", result);
     }
 
+    /**
+     * Test case for generating a unique student ID.
+     */
     @Test
     void generateUniqueStudentID() {
 
@@ -169,6 +181,9 @@ class LoginServiceTest {
 
  */
 
+    /**
+     * Test case for registering a user.
+     */
     @Test
     void registerUser() {
         RegistrationRequest request = new RegistrationRequest();
@@ -196,6 +211,9 @@ class LoginServiceTest {
     }
 
 
+    /**
+     * Test case for checking if an email exists in the system.
+     */
     @Test
     void emailExists() {
         String existingEmail = "test@example.com";

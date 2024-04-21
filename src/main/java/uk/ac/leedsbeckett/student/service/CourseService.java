@@ -132,4 +132,5 @@ public class CourseService {
         courseRepository.delete(courseToDelete);
         return ResponseEntity.ok("Course deleted: " + courseToDelete.getTitle());
     }
+
 }

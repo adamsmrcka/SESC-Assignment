@@ -50,4 +50,12 @@ public class Course {
         this.fee = fee;
         this.studentsEnrolledInCourse = new HashSet<>();
     }
+    public Course(Long id, String title, String abbreviation, String description, double fee) {
+        this.id = id;
+        this.title = title;
+        this.abbreviation = abbreviation;
+        this.description = description;
+        this.fee = fee;
+        this.studentsEnrolledInCourse = new HashSet<>();
+    }
 }

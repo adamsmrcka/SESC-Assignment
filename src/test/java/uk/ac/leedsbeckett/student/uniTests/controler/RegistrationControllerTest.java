@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.controler;
+package uk.ac.leedsbeckett.student.uniTests.controler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,9 @@ import java.net.URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the RegistrationController class.
+ */
 public class RegistrationControllerTest {
 
     @Mock
@@ -29,6 +32,9 @@ public class RegistrationControllerTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+    /**
+     * Test case for creating a new student registration.
+     */
     @Test
     public void testCreateNewStudentJson() {
         // Create a mock RegistrationRequest
@@ -49,6 +55,9 @@ public class RegistrationControllerTest {
         verify(loginService, times(1)).CreateNewStudentJson(request);
     }
 
+    /**
+     * Test case for checking login credentials.
+     */
     @Test
     public void testCheckLoginJson() {
         // Create a mock RegistrationRequest

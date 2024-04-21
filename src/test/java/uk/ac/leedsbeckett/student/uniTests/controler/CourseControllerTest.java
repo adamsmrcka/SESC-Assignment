@@ -1,4 +1,4 @@
-package uk.ac.leedsbeckett.student.controler;
+package uk.ac.leedsbeckett.student.uniTests.controler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the CourseController class.
+ */
 public class CourseControllerTest {
 
     @Mock
@@ -30,6 +33,9 @@ public class CourseControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Test case for retrieving all courses as JSON.
+     */
     @Test
     public void testGetAllCoursesJson() {
         // Create mock courses
@@ -58,6 +64,9 @@ public class CourseControllerTest {
         verify(courseService, times(1)).getAllCoursesJson();
     }
 
+    /**
+     * Test case for retrieving a specific course as JSON by ID.
+     */
     @Test
     public void testGetCourseJson() {
         // Create mock course
@@ -76,6 +85,9 @@ public class CourseControllerTest {
         verify(courseService, times(1)).getCourseByIdJson(1L);
     }
 
+    /**
+     * Test case for retrieving enrolled courses of a student by ID as JSON.
+     */
     @Test
     public void testGetEnrolledCoursesByStudentId() {
         // Mock student ID
@@ -107,6 +119,9 @@ public class CourseControllerTest {
         verify(courseService, times(1)).getEnrolledCoursesByStudentIdJson(studentId);
     }
 
+    /**
+     * Test case for creating a new course as JSON.
+     */
     @Test
     public void testCreateCourseJson() {
         // Create a mock new course
