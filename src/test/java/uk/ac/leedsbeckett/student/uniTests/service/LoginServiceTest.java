@@ -9,16 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.leedsbeckett.student.Request.RegistrationRequest;
 import uk.ac.leedsbeckett.student.model.*;
 import uk.ac.leedsbeckett.student.service.IntegrationService;
 import uk.ac.leedsbeckett.student.service.LoginService;
 import uk.ac.leedsbeckett.student.service.StudentService;
-
-import java.net.URI;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
